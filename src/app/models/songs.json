@@ -1,0 +1,16 @@
+{
+  "songs": [
+    {
+      "title": "no hay lugar mas alto",
+      "artist": "Miel San Marcos",
+      "genres": ["pop", "adoracion"],
+      "lyrics": "a tus pies, arde mi corazon"
+    },
+    {
+      "title": "way maker",
+      "artist": "Priscilla Bueno",
+      "genres": ["pop", "adoracion"],
+      "lyrics": "aqui estas, te vemos mover"
+    }
+  ]
+}
