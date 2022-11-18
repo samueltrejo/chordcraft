@@ -9,6 +9,7 @@ import { Song } from 'src/app/models/song';
   <div class="container mt-5">
     <ul class="list-group">
       <li *ngFor="let song of songs" class="list-group-item lib-song" routerLink="{{song.id}}">{{song.title}}</li>
+      <li class="list-group-item lib-song" (click)="newSong()">new song +</li>
     </ul>
   </div>
   `,
@@ -36,6 +37,16 @@ export class LibraryComponent implements OnInit {
     ).subscribe(data => {
       this.songs = data;
     });
+  }
+
+  newSong(): void {
+    const song: Song = {
+      id: '',
+      title: 'new song',
+      artist: 'artist here',
+      genres: [],
+      lyrics: 'lyrics here'
+    }
   }
 
 }
