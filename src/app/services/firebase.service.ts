@@ -1,31 +1,30 @@
 import { Injectable } from '@angular/core';
-import { AngularFireDatabase, AngularFireList } from '@angular/fire/compat/database';
 import { Song } from '../models/song';
+
+import { initializeApp } from 'firebase/app';
+import { getDatabase, ref, onValue, Database, DatabaseReference} from "firebase/database";
+import { fbConfig } from '../models/fbConfig';
+import { FirebaseApp } from '@angular/fire/app';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FirebaseService {
   private path = '/songs';
-  songs : AngularFireList<Song> = null;
+  private app: FirebaseApp
+  private db: Database;
 
-  constructor(private database: AngularFireDatabase) {
-    this.songs = database.list(this.path);
+  constructor() {
+      // Initialize Firebase
+      this.app = initializeApp(fbConfig);
+      this.db = getDatabase();
   }
 
-  getAll(): AngularFireList<Song> {
-    return this.songs;
+  getSongsRef(): DatabaseReference {
+    return ref(this.db, '/songs');
   }
 
-  create(song: Song): any {
-    return this.songs.push(song);
-  }
-
-  update(songId: string, song: Song): Promise<void> {
-    return this.songs.update(songId, song);
-  }
-
-  delete(songId: string): Promise<void> {
-    return this.songs.remove(songId);
+  getSongRef(songId: string): DatabaseReference {
+    return ref(this.db, '/songs/' + songId);
   }
 }
