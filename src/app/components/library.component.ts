@@ -1,7 +1,8 @@
-import { Component, NgZone, OnInit } from '@angular/core';
-import { map, catchError } from 'rxjs/operators';
+import { Component, OnInit } from '@angular/core';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { Song } from 'src/app/models/song';
+import { DatabaseReference, onValue, push, child } from 'firebase/database';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-library',
@@ -18,35 +19,37 @@ import { Song } from 'src/app/models/song';
 })
 export class LibraryComponent implements OnInit {
   songs: any;
+  songsRef: DatabaseReference;
 
   constructor(
-    private zone: NgZone,
-    private firebaseService: FirebaseService) { }
+    private firebaseService: FirebaseService,
+    private router: Router) { }
 
   ngOnInit(): void {
     this.getSongs();
   }
 
   getSongs(): void {
-    this.firebaseService.getAll().snapshotChanges().pipe(
-      map(changes =>
-        changes.map(c =>
-          ({ id: c.payload.key, ...c.payload.val() })
-        )
-      )
-    ).subscribe(data => {
-      this.songs = data;
-    });
+    this.songsRef = this.firebaseService.getSongsRef();
+    onValue(this.songsRef, (snapshot) => {
+      const data = snapshot.val();
+      console.log(data);
+      this.songs = Object.keys(data).map(songId => {
+        data[songId].id = songId;
+        return data[songId];
+      });
+    })
   }
 
   newSong(): void {
     const song: Song = {
-      id: '',
-      title: 'new song',
-      artist: 'artist here',
-      genres: [],
-      lyrics: 'lyrics here'
+      title: 'my new song...',
+      artist: '',
+      // genres: [],
+      lyrics: ''
     }
+
+    push(this.songsRef, song).then(x => this.router.navigate([x.key]));
   }
 
 }
