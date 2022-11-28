@@ -13,13 +13,13 @@ import { FormBuilder, FormGroup } from '@angular/forms';
       <form *ngIf="songForm" [formGroup]="songForm">
 
       <!-- song info -->
-        <input id="title" class="d-block" formControlName="title" autocomplete="off" placeholder="Title">
-        <input id="artist" class="d-block" formControlName="artist" autocomplete="off" placeholder="Artist">
+        <input id="title" class="d-block" formControlName="title" autocomplete="off" placeholder="Title" disabled>
+        <input id="artist" class="d-block" formControlName="artist" autocomplete="off" placeholder="Artist" disabled>
 
         <!-- menu buttons -->
         <i class="bi bi-pencil" (click)="toggleEdit()"></i>
-        <i class="bi bi-journal-arrow-down" (click)="transpose(false)"></i>
-        <i class="bi bi-journal-arrow-up" (click)="transpose(true)"></i>
+        <i class="bi bi-journal-arrow-down me-2" style="font-size: 2rem; cursor: pointer;" (click)="transpose(false)"></i>
+        <i class="bi bi-journal-arrow-up" style="font-size: 2rem; cursor: pointer;" (click)="transpose(true)"></i>
 
         <!-- song table -->
         <div *ngIf="!isEdit" class="song-lyrics mt-3">
