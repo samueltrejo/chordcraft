@@ -33,7 +33,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
         <!-- song textarea -->
         <div *ngIf="isEdit">
           <!-- <textarea id="song-lyrics" class="song-textarea text-light" rows="{{song.lyrics.split('\n').length}}">{{song.lyrics}}</textarea> -->
-          <textarea id="lyrics" class="song-textarea text-light" rows="{{song.lyrics.split('\n').length}}" formControlName="lyrics" placeholder="Lyrics"></textarea>
+          <textarea id="lyrics" class="song-textarea text-light" formControlName="lyrics" placeholder="Lyrics" (keyup)="autoAdjustHeight()"></textarea>
         </div>
       </form>
 
@@ -142,6 +142,12 @@ export class SongComponent implements OnInit {
       }
     }
     this.songForm.controls['lyrics'].setValue(transposedLyrics);
+  }
+
+  // textarea auto height
+  autoAdjustHeight(element) {
+    element.style.height = "5px";
+    element.style.height = (element.scrollHeight)+"px";
   }
 
 }
