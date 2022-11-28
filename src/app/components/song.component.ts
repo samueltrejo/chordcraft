@@ -33,7 +33,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
         <!-- song textarea -->
         <div *ngIf="isEdit">
           <!-- <textarea id="song-lyrics" class="song-textarea text-light" rows="{{song.lyrics.split('\n').length}}">{{song.lyrics}}</textarea> -->
-          <textarea id="lyrics" class="song-textarea text-light" rows="{{song.lyrics.split('\n').length}}" formControlName="lyrics" placeholder="Lyrics"></textarea>
+          <textarea id="lyrics" class="song-textarea text-light" formControlName="lyrics" placeholder="Lyrics"></textarea>
         </div>
       </form>
 
@@ -55,7 +55,7 @@ export class SongComponent implements OnInit {
   song: Song;
   songsRef: DatabaseReference;
   songForm: FormGroup;
-  isEdit: boolean = false;
+  isEdit: boolean = true;
 
   constructor(
     private fb: FormBuilder,
