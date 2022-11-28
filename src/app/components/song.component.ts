@@ -33,7 +33,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
         <!-- song textarea -->
         <div *ngIf="isEdit">
           <!-- <textarea id="song-lyrics" class="song-textarea text-light" rows="{{song.lyrics.split('\n').length}}">{{song.lyrics}}</textarea> -->
-          <textarea id="lyrics" class="song-textarea text-light" formControlName="lyrics" placeholder="Lyrics" (keyup)="autoAdjustHeight()"></textarea>
+          <textarea id="lyrics" class="song-textarea text-light" formControlName="lyrics" placeholder="Lyrics"></textarea>
         </div>
       </form>
 
