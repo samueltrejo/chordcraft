@@ -7,9 +7,9 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-library',
   template: `
-  <div class="container mt-5">
+  <div class="library container mt-5">
     <ul class="list-group">
-      <li *ngFor="let song of songs" class="list-group-item lib-song" routerLink="{{song.id}}">{{song.title}}</li>
+      <li *ngFor="let song of songs" class="list-group-item" routerLink="{{song.id}}">{{song.title}}</li>
       <li class="list-group-item lib-song" (click)="newSong()">new song +</li>
     </ul>
   </div>

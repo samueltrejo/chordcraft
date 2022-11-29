@@ -8,44 +8,42 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 @Component({
   selector: 'app-song',
   template: `
-    <div *ngIf="song" class="song container my-5 p-4 text-light" (keyup)="autoSave($event)">
+    <div *ngIf="song" class="song" (keyup)="autoSave($event)">
+      <div class="song-container container my-5 p-4">
+        <form *ngIf="songForm" [formGroup]="songForm">
+  
+          <!-- song info -->
+          <input class="song-title d-block" formControlName="title" autocomplete="off" placeholder="Title">
+          <input class="song-artist d-block" formControlName="artist" autocomplete="off" placeholder="Artist">
+  
+          <!-- menu buttons -->
+          <i class="bi bi-pencil me-2" (click)="toggleEdit()"></i>
+          <i class="bi bi-journal-arrow-down me-2" (click)="transpose(false)"></i>
+          <i class="bi bi-journal-arrow-up" (click)="transpose(true)"></i>
+  
+          <!-- song table -->
+          <div *ngIf="!isEdit" class="song-table mt-3">
+            <table>
+              <tbody *ngFor="let lyric of songForm.value.lyrics.split('\n')">
+                <app-lyric [lyric]="lyric"></app-lyric>
+              </tbody>
+            </table>
+          </div>
+  
+          <!-- song textarea -->
+          <div *ngIf="isEdit">
+            <!-- <textarea class="song-textarea" rows="{{song.lyrics.split('\n').length}}">{{song.lyrics}}</textarea> -->
+            <textarea id="lyrics" class="song-textarea" formControlName="lyrics" placeholder="Lyrics"></textarea>
+          </div>
 
-      <form *ngIf="songForm" [formGroup]="songForm">
-
-      <!-- song info -->
-        <input id="title" class="d-block" formControlName="title" autocomplete="off" placeholder="Title">
-        <input id="artist" class="d-block" formControlName="artist" autocomplete="off" placeholder="Artist">
-
-        <!-- menu buttons -->
-        <i class="bi bi-pencil" (click)="toggleEdit()"></i>
-        <i class="bi bi-journal-arrow-down" (click)="transpose(false)"></i>
-        <i class="bi bi-journal-arrow-up" (click)="transpose(true)"></i>
-
-        <!-- song table -->
-        <div *ngIf="!isEdit" class="song-lyrics mt-3">
-          <table>
-            <tbody *ngFor="let lyric of songForm.value.lyrics.split('\n')">
-              <app-lyric [lyric]="lyric"></app-lyric>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- song textarea -->
-        <div *ngIf="isEdit">
-          <!-- <textarea id="song-lyrics" class="song-textarea text-light" rows="{{song.lyrics.split('\n').length}}">{{song.lyrics}}</textarea> -->
-          <textarea id="lyrics" class="song-textarea text-light" formControlName="lyrics" placeholder="Lyrics"></textarea>
-        </div>
-      </form>
-
-      <!-- song genres -->
-      <!-- <div id="song-genres" class="mt-2">
-        <span *ngFor="let genre of song.genres" class="badge bg-light text-dark me-2">{{genre}} <i class="bi bi-x" (click)="removeGenre(genre)"></i></span>
-        <span class="badge bg-light text-dark"><i class="bi bi-plus" (click)="addGenre()"></i></span>
-      </div> -->
+          <!-- song genres -->
+          <!-- <div id="song-genres" class="mt-2">
+            <span *ngFor="let genre of song.genres" class="badge bg-light me-2">{{genre}} <i class="bi bi-x" (click)="removeGenre(genre)"></i></span>
+            <span class="badge bg-light"><i class="bi bi-plus" (click)="addGenre()"></i></span>
+          </div> -->
+        </form>
+      </div>
     </div>
-
-      <!-- <div id="sermon" class="h-100 w-100 border-0" style="padding-top: 12rem;" [innerHTML]="sermon.data" (click)="deletetverse($event)" (keyup)="autoSaveData()"></div> -->
-      <!-- <div id="sermon" class="h-100 w-100 border-0" style="padding-top: 12rem;"></div> -->
   `,
   styles: [
   ]
