@@ -10,23 +10,31 @@ import { FormBuilder, FormGroup } from '@angular/forms';
   template: `
     <div *ngIf="song" class="song">
 
+    <div class="position-relative">
+      <i class="bi bi-incognito" (click)="toggleAdmin()"></i>
+    </div>
+
       <div class="song-container container p-4">
         <form *ngIf="songForm" [formGroup]="songForm" (keyup)="autoSave()">
   
           <!-- song info -->
-          <div id="song-genres" class="mt-2">
+          <div *ngIf="isAdmin" id="song-genres" class="mt-2">
             <span *ngFor="let genre of song.genres" class="badge bg-primary me-2">{{genre}} <i class="bi bi-x" (click)="removeGenre(genre)"></i></span>
             <span class="badge bg-primary" data-bs-toggle="modal" data-bs-target="#genre-modal">Add Genre<i class="bi bi-plus"></i></span>
           </div>
 
-          <div class="song-info">
+          <div *ngIf="isAdmin" class="song-info">
             <input class="song-title d-block" formControlName="title" autocomplete="off" placeholder="Title">
             <input class="song-artist d-block" formControlName="artist" autocomplete="off" placeholder="Artist">
+          </div>
+          <div *ngIf="!isAdmin" class="song-info">
+            <input class="song-title d-block" formControlName="title" autocomplete="off" placeholder="Title" disabled>
+            <input class="song-artist d-block" formControlName="artist" autocomplete="off" placeholder="Artist" disabled>
           </div>
 
           <!-- menu buttons -->
           <div class="song-menu d-flex mt-2">
-            <button class="btn btn-outline-primary btn-sm me-2" (click)="toggleEdit()">Edit Lyrics</button>
+            <button *ngIf="isAdmin" class="btn btn-outline-primary btn-sm me-2" (click)="toggleEdit()">Edit Lyrics</button>
             <button class="btn btn-outline-primary btn-sm me-2" (click)="transpose(false)">Transpose Down</button>
             <button class="btn btn-outline-primary btn-sm me-2" (click)="transpose(true)">Transpose Up</button>
           </div>
@@ -78,6 +86,7 @@ export class SongComponent implements OnInit {
   songsRef: DatabaseReference;
   songForm: FormGroup;
   isEdit: boolean = false;
+  isAdmin: boolean = false;
 
   @ViewChild('lyrics') textArea;
 
@@ -139,6 +148,10 @@ export class SongComponent implements OnInit {
     if (this.isEdit) {
       setTimeout(x => document.getElementById('lyrics').focus(), 100);
     }
+  }
+
+  toggleAdmin(): void {
+    this.isAdmin = !this.isAdmin;
   }
 
   transpose(transposeUp: boolean): void {
