@@ -9,7 +9,9 @@ $colorDark: #404040;
 $colorGrey: #9f9f9f;
 
 // font sizes
+$fontSizeXs: .7rem;
 $fontSizeSm: .85rem;
+$fontSizeMd: 1.1rem;
 $fontSizeLg: 2rem;
 
 // font families
@@ -25,6 +27,11 @@ body {
 
 body::-webkit-scrollbar {
   display: none;
+}
+
+/* Navbar */
+.nav {
+  background-color: $colorGrey;
 }
 
 /* Library */
@@ -54,11 +61,22 @@ body::-webkit-scrollbar {
 
     .song-title {
       font-size: $fontSizeLg;
+      border-bottom: 2px solid transparent;
+    }
+
+    .song-artist {
+      font-size: $fontSizeMd;
+      border-bottom: 2px solid transparent;
+    }
+
+    .song-title:focus, .song-artist:focus {
+      border-bottom: 2px solid $colorBlue;
+      // width: 400px;
     }
 
     .song-textarea {
       width: 100%;
-      height: 500px;
+      height: 600px;
       box-sizing: border-box;
       background-color: $colorGrey;
       color: $colorDark;
@@ -76,6 +94,10 @@ body::-webkit-scrollbar {
       overflow: scroll;
       -ms-overflow-style: none;
       scrollbar-width: none;
+      background-color: $colorGrey;
+      border-top-right-radius: 9px;
+      border-top: 4px solid $colorBlue;
+      border-right: 4px solid $colorBlue;
 
       td {
         white-space: nowrap;
@@ -88,10 +110,44 @@ body::-webkit-scrollbar {
     }
   }
 
-
-  .bi {
-    font-size: $fontSizeLg;
-    color: $colorBlue;
+  .badge {
+    font-size: $fontSizeXs;
+    font-weight: unset;
+    border: none;
     cursor: pointer;
   }
+
+  .genre-modal {
+    .modal-content {
+      background-color: $colorGrey;
+    }
+  
+    .modal-header {
+      border: none;
+      padding-bottom: 0px;
+    }
+
+    .song-genre {
+      font-family: $fontFamHeebo;
+      color: $colorDark;
+      width: 100%;
+      outline: none;
+      border: none;
+      background-color: transparent;
+      border-bottom: 2px solid $colorBlue;
+    }
+
+    .genre-submit {
+      position: absolute;
+      right: 20px;
+      bottom: 20px;
+    }
+  
+    .bi {
+      // font-size: $fontSizeLg;
+      color: $colorBlue;
+      cursor: pointer;
+    }
+  }
+
 }

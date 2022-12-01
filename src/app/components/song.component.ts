@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { child, DatabaseReference, get, ref, set } from "firebase/database";
@@ -8,21 +8,39 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 @Component({
   selector: 'app-song',
   template: `
-    <div *ngIf="song" class="song" (keyup)="autoSave($event)">
-      <div class="song-container container my-5 p-4">
-        <form *ngIf="songForm" [formGroup]="songForm">
+    <div *ngIf="song" class="song">
+
+    <div class="position-relative">
+      <i class="bi bi-incognito" (click)="toggleAdmin()"></i>
+    </div>
+
+      <div class="song-container container p-4">
+        <form *ngIf="songForm" [formGroup]="songForm" (keyup)="autoSave()">
   
           <!-- song info -->
-          <input class="song-title d-block" formControlName="title" autocomplete="off" placeholder="Title">
-          <input class="song-artist d-block" formControlName="artist" autocomplete="off" placeholder="Artist">
-  
+          <div *ngIf="isAdmin" id="song-genres" class="mt-2">
+            <span *ngFor="let genre of song.genres" class="badge bg-primary me-2">{{genre}} <i class="bi bi-x" (click)="removeGenre(genre)"></i></span>
+            <span class="badge bg-primary" data-bs-toggle="modal" data-bs-target="#genre-modal">Add Genre<i class="bi bi-plus"></i></span>
+          </div>
+
+          <div *ngIf="isAdmin" class="song-info">
+            <input class="song-title d-block" formControlName="title" autocomplete="off" placeholder="Title">
+            <input class="song-artist d-block" formControlName="artist" autocomplete="off" placeholder="Artist">
+          </div>
+          <div *ngIf="!isAdmin" class="song-info">
+            <input class="song-title d-block" formControlName="title" autocomplete="off" placeholder="Title" disabled>
+            <input class="song-artist d-block" formControlName="artist" autocomplete="off" placeholder="Artist" disabled>
+          </div>
+
           <!-- menu buttons -->
-          <i class="bi bi-pencil me-2" (click)="toggleEdit()"></i>
-          <i class="bi bi-journal-arrow-down me-2" (click)="transpose(false)"></i>
-          <i class="bi bi-journal-arrow-up" (click)="transpose(true)"></i>
+          <div class="song-menu d-flex mt-2">
+            <button *ngIf="isAdmin" class="btn btn-outline-primary btn-sm me-2" (click)="toggleEdit()">Edit Lyrics</button>
+            <button class="btn btn-outline-primary btn-sm me-2" (click)="transpose(false)">Transpose Down</button>
+            <button class="btn btn-outline-primary btn-sm me-2" (click)="transpose(true)">Transpose Up</button>
+          </div>
   
           <!-- song table -->
-          <div *ngIf="!isEdit" class="song-table mt-3">
+          <div *ngIf="!isEdit" class="song-table mt-2">
             <table>
               <tbody *ngFor="let lyric of songForm.value.lyrics.split('\n')">
                 <app-lyric [lyric]="lyric"></app-lyric>
@@ -31,18 +49,32 @@ import { FormBuilder, FormGroup } from '@angular/forms';
           </div>
   
           <!-- song textarea -->
-          <div *ngIf="isEdit">
+          <div *ngIf="isEdit" class="mt-2">
             <!-- <textarea class="song-textarea" rows="{{song.lyrics.split('\n').length}}">{{song.lyrics}}</textarea> -->
-            <textarea id="lyrics" class="song-textarea" formControlName="lyrics" placeholder="Lyrics"></textarea>
+            <textarea #lyrics id="lyrics" class="song-textarea" formControlName="lyrics" placeholder="Lyrics" autofocus></textarea>
           </div>
 
-          <!-- song genres -->
-          <!-- <div id="song-genres" class="mt-2">
-            <span *ngFor="let genre of song.genres" class="badge bg-light me-2">{{genre}} <i class="bi bi-x" (click)="removeGenre(genre)"></i></span>
-            <span class="badge bg-light"><i class="bi bi-plus" (click)="addGenre()"></i></span>
-          </div> -->
         </form>
       </div>
+
+      <!-- genre modal -->
+      <div class="genre-modal modal fade" id="genre-modal">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <div class="modal-title" id="exampleModalLabel">Add a genre</div>
+              <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+              <i class="bi bi-x-circle" data-bs-dismiss="modal"></i>
+            </div>
+            <div class="modal-body position-relative">
+              <!-- <input class="song-genre d-block" formControlName="title" autocomplete="off" placeholder="Genre"> -->
+              <input #genre class="song-genre d-block" autocomplete="off" placeholder="Genre">
+              <i class="genre-submit bi bi-send-fill" (click)="addGenre(genre)"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   `,
   styles: [
@@ -53,7 +85,10 @@ export class SongComponent implements OnInit {
   song: Song;
   songsRef: DatabaseReference;
   songForm: FormGroup;
-  isEdit: boolean = true;
+  isEdit: boolean = false;
+  isAdmin: boolean = false;
+
+  @ViewChild('lyrics') textArea;
 
   constructor(
     private fb: FormBuilder,
@@ -71,34 +106,52 @@ export class SongComponent implements OnInit {
       const data: Song = snapshot.val();
       data.id = this.songId;
       this.song = data;
+
+      if (this.song.genres == null) {
+        this.song.genres = [];
+      }
+
       console.log(this.song);
 
       this.songForm = this.fb.group({
         title: [this.song.title],
         artist: [this.song.artist],
-        lyrics: [this.song.lyrics]
+        lyrics: [this.song.lyrics],
+        genres: [this.song.genres]
       });
     });
   }
 
-  autoSave($event): void {
-    console.log($event.target.id);
+  autoSave(): void {
     console.log(this.songForm.value);
 
     const songRef = this.firebaseService.getSongRef(this.songId);
     set(songRef, this.songForm.value);
   }
 
-  // removeGenre(genre: string): void {
-  //   this.song.genres = this.song.genres.filter(x => x != genre)
-  // }
+  removeGenre(genre: string): void {
+    this.song.genres = this.song.genres.filter(x => x != genre);
+    this.songForm.controls['genres'].setValue(this.song.genres);
+    this.autoSave();
+  }
 
-  // addGenre(): void {
-    
-  // }
+  addGenre(ref: any): void {
+    if (ref.value != null && ref.value != '') {
+      this.song.genres.push(ref.value);
+      this.songForm.controls['genres'].setValue(this.song.genres);
+      this.autoSave();
+    }
+  }
 
-  toggleEdit($event: any): void {
+  toggleEdit(): void {
     this.isEdit = !this.isEdit;
+    if (this.isEdit) {
+      setTimeout(x => document.getElementById('lyrics').focus(), 100);
+    }
+  }
+
+  toggleAdmin(): void {
+    this.isAdmin = !this.isAdmin;
   }
 
   transpose(transposeUp: boolean): void {
