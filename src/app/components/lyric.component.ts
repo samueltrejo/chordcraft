@@ -5,7 +5,7 @@ import { Component, Input, OnInit } from '@angular/core';
   template: `
     <tbody>
       <tr class="chords">
-        <td *ngFor="let chord of chords">{{chord}}</td>
+        <td class="pe-1" *ngFor="let chord of chords">{{chord}}</td>
       </tr>
       <tr class="lyrics">
         <td *ngFor="let verse of verses">{{verse}}</td>
