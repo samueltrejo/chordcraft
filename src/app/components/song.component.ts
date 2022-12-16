@@ -35,8 +35,8 @@ import { FormBuilder, FormGroup } from '@angular/forms';
           <!-- menu buttons -->
           <div class="song-menu d-flex mt-2">
             <button *ngIf="isAdmin" class="btn btn-outline-primary btn-sm me-2" (click)="toggleEdit()">Edit Lyrics</button>
-            <button class="btn btn-outline-primary btn-sm me-2" (click)="transpose(false)">Transpose Down</button>
-            <button class="btn btn-outline-primary btn-sm me-2" (click)="transpose(true)">Transpose Up</button>
+            <button *ngIf="!isEdit" class="btn btn-outline-primary btn-sm me-2" (click)="transpose(false)">Transpose Down</button>
+            <button *ngIf="!isEdit" class="btn btn-outline-primary btn-sm me-2" (click)="transpose(true)">Transpose Up</button>
             <button *ngIf="isEdit" class="btn btn-outline-primary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#chord-modal">Add Chord</button>
           </div>
 
@@ -94,45 +94,50 @@ import { FormBuilder, FormGroup } from '@angular/forms';
               <i class="bi bi-x-circle" data-bs-dismiss="modal"></i>
             </div>
             <div class="modal-body position-relative">
-              <div class="chord text-center">{{chordBase}}{{chordDesc}}</div>
 
-              <div class="btn-toolbar justify-content-center mt-1" role="toolbar">
-                <div class="btn-group me-2" role="group" (click)="setChordBase($event)">
-                  <button type="button" class="btn btn-outline-primary btn-sm">A</button>
-                  <button type="button" class="btn btn-outline-primary btn-sm">A#</button>
-                  <button type="button" class="btn btn-outline-primary btn-sm">B</button>
-                  <button type="button" class="btn btn-outline-primary btn-sm">C</button>
-                  <button type="button" class="btn btn-outline-primary btn-sm">C#</button>
-                  <button type="button" class="btn btn-outline-primary btn-sm">D</button>
-                  <button type="button" class="btn btn-outline-primary btn-sm">D#</button>
-                  <button type="button" class="btn btn-outline-primary btn-sm">E</button>
-                  <button type="button" class="btn btn-outline-primary btn-sm">F</button>
-                  <button type="button" class="btn btn-outline-primary btn-sm">F#</button>
-                  <button type="button" class="btn btn-outline-primary btn-sm">G</button>
-                  <button type="button" class="btn btn-outline-primary btn-sm">G#</button>
+              <form *ngIf="songForm" [formGroup]="chordDescriptorForm">
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text btn btn-outline-primary btn-sm chord-base-text" id="basic-addon1">{{chordBase}}</span>
+                  <input type="text" class="form-control chord-descriptor-input border-primary" formControlName="chordDescriptor">
                 </div>
-              </div>
 
-              <div class="btn-toolbar justify-content-center mt-1" role="toolbar">
-                <div class="btn-group me-2" role="group" (click)="setChordDescriptor($event)">
-                  <button type="button" class="btn btn-outline-primary btn-sm">m</button>
-                  <button type="button" class="btn btn-outline-primary btn-sm">dim</button>
-                  <button type="button" class="btn btn-outline-primary btn-sm">aug</button>
-                  <!-- <button type="button" class="btn btn-outline-primary btn-sm">sus2</button>
-                  <button type="button" class="btn btn-outline-primary btn-sm">sus4</button> -->
-                  <button type="button" class="btn btn-outline-primary btn-sm">5</button>
-                  <button type="button" class="btn btn-outline-primary btn-sm">6</button>
-                  <button type="button" class="btn btn-outline-primary btn-sm">7</button>
-                  <button type="button" class="btn btn-outline-primary btn-sm">9</button>
-                  <button type="button" class="btn btn-outline-primary btn-sm">m6</button>
-                  <button type="button" class="btn btn-outline-primary btn-sm">m7</button>
-                  <button type="button" class="btn btn-outline-primary btn-sm">m9</button>
+                <div class="btn-toolbar justify-content-center mt-1" role="toolbar">
+                  <div class="btn-group me-2" role="group" (click)="setChordBase($event)">
+                    <button type="button" class="btn btn-outline-primary btn-sm">A</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">A#</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">B</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">C</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">C#</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">D</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">D#</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">E</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">F</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">F#</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">G</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">G#</button>
+                  </div>
                 </div>
-              </div>
-
-              <div class="mt-1">
-                <button class="btn btn-outline-primary btn-sm w-100" data-bs-dismiss="modal" (click)="addChord()">Add Chord</button>
-              </div>
+  
+                <div class="btn-toolbar justify-content-center mt-1" role="toolbar">
+                  <div class="btn-group me-2" role="group" (click)="setChordDescriptor($event)">
+                    <button type="button" class="btn btn-outline-primary btn-sm">m</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">dim</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">aug</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">sus</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">5</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">6</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">7</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">9</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">m6</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">m7</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">m9</button>
+                  </div>
+                </div>
+  
+                <div class="mt-1">
+                  <button class="btn btn-outline-primary btn-sm w-100" data-bs-dismiss="modal" (click)="addChord()">Add Chord</button>
+                </div>
+              </form>
 
             </div>
           </div>
@@ -152,9 +157,10 @@ export class SongComponent implements OnInit {
   isEdit: boolean = false;
   isAdmin: boolean = true;
   chordBase: string = "A";
-  chordDesc: string = "";
   chords: string[] = [];
   caret: number;
+
+  chordDescriptorForm: FormGroup = this.fb.group({chordDescriptor: ''});
 
   @ViewChild('lyrics') textArea;
 
@@ -179,13 +185,16 @@ export class SongComponent implements OnInit {
         this.song.genres = [];
       }
 
-      console.log(this.song);
+      if (this.song.chords == null) {
+        this.song.chords = [];
+      }
 
       this.songForm = this.fb.group({
         title: [this.song.title],
         artist: [this.song.artist],
         lyrics: [this.song.lyrics],
-        genres: [this.song.genres]
+        genres: [this.song.genres],
+        chords: [this.song.chords]
       });
     });
   }
@@ -216,7 +225,8 @@ export class SongComponent implements OnInit {
   }
 
   addChord(): void {
-    const chord = this.chordBase + this.chordDesc;
+    const chordDesc = this.chordDescriptorForm.controls['chordDescriptor'].value;
+    const chord = this.chordBase + chordDesc;
     this.chords.push(chord);
     let lyrics = this.songForm.controls['lyrics'].value;
     lyrics = lyrics.slice(0, this.caret) + `[${chord}]` + lyrics.slice(this.caret);
@@ -241,10 +251,11 @@ export class SongComponent implements OnInit {
 
   setChordDescriptor($event): void {
     if ($event.srcElement.localName == "button") {
-      if (this.chordDesc == $event.srcElement.innerText) {
-        this.chordDesc = "";
+      const chordDesc = this.chordDescriptorForm.controls['chordDescriptor'].value;
+      if (chordDesc == $event.srcElement.innerText) {
+        this.chordDescriptorForm.controls['chordDescriptor'].setValue('');
       } else {
-        this.chordDesc = $event.srcElement.innerText;
+        this.chordDescriptorForm.controls['chordDescriptor'].setValue($event.srcElement.innerText);
       }
     }
   }

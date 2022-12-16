@@ -3,5 +3,6 @@ export interface Song {
   title: string;
   artist: string;
   genres?: string[];
+  chords?: string[];
   lyrics: string;
 }
