@@ -35,6 +35,15 @@ body::-webkit-scrollbar {
 }
 
 /* Library */
+.library {
+  font-family: $fontFamHeebo;
+  color: $colorDark;
+
+  .list-group-item {
+    background-color: $colorGrey;
+    cursor: pointer;
+  }
+}
 
 /* Song */
 .song {
@@ -81,34 +90,43 @@ body::-webkit-scrollbar {
       background-color: $colorGrey;
       color: $colorDark;
       border: none;
-      border-top-right-radius: 9px;
-      border-top: 4px solid $colorBlue;
-      border-right: 4px solid $colorBlue;
+      border-radius: 9px;
+      padding: 5px;
+      // border-top-right-radius: 9px;
+      // border-top: 4px solid $colorBlue;
+      // border-right: 4px solid $colorBlue;
       resize: none;
       outline: none;
       -ms-overflow-style: none;
       scrollbar-width: none;
+      border: 1px solid #858585;
+    }
+
+    .song-textarea:focus {
+      border-color: rgb(13 110 253 / 25%);
+      box-shadow: 0 0 0 0.25rem rgb(13 110 253 / 25%);
     }
 
     .song-table {
-      overflow: scroll;
-      -ms-overflow-style: none;
-      scrollbar-width: none;
+      // overflow: scroll;
+      // -ms-overflow-style: none;
+      // scrollbar-width: none;
       background-color: $colorGrey;
-      border-top-right-radius: 9px;
-      border-top: 4px solid $colorBlue;
-      border-right: 4px solid $colorBlue;
+      line-height: 18px;
+      // border-top-right-radius: 9px;
+      // border-top: 4px solid $colorBlue;
+      // border-right: 4px solid $colorBlue;
 
       td {
         white-space: nowrap;
-        padding: 0px;
+        // padding: 0px;
         white-space: pre;
       }
     }
 
-    .song-textarea::-webkit-scrollbar, .song-table::-webkit-scrollbar {
-      display: none;
-    }
+    // .song-textarea::-webkit-scrollbar, .song-table::-webkit-scrollbar {
+    //   display: none;
+    // }
   }
 
   .badge {
@@ -151,4 +169,17 @@ body::-webkit-scrollbar {
     }
   }
 
+  /* Lyrics */
+  .chord button {
+    color: $colorDark;
+    padding: 0px;
+    // padding-left: 2px;
+    padding-right: 3px;
+    border: 0px;
+    background-color: transparent;
+  }
+
+  .chord button:hover {
+    color: $colorBlue;
+  }
 }

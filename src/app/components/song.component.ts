@@ -86,7 +86,7 @@ export class SongComponent implements OnInit {
   songsRef: DatabaseReference;
   songForm: FormGroup;
   isEdit: boolean = false;
-  isAdmin: boolean = false;
+  isAdmin: boolean = true;
 
   @ViewChild('lyrics') textArea;
 
