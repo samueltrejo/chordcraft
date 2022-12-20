@@ -5,7 +5,7 @@ import { Component, Input, OnInit } from '@angular/core';
   template: `
     <tbody>
       <tr class="chords">
-        <td *ngFor="let chord of chords" class="chord">
+        <td *ngFor="let chord of chords" class="chord pe-1">
           <button>{{chord}}</button>
         </td>
       </tr>
