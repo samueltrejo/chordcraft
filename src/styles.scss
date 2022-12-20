@@ -118,7 +118,7 @@ body::-webkit-scrollbar {
     cursor: pointer;
   }
 
-  .genre-modal {
+  .genre-modal, .chord-modal {
     .modal-content {
       background-color: $colorGrey;
     }
@@ -148,6 +148,18 @@ body::-webkit-scrollbar {
       // font-size: $fontSizeLg;
       color: $colorBlue;
       cursor: pointer;
+    }
+
+    .chord {
+      font-size: $fontSizeMd;
+    }
+
+    .chord-descriptor-input {
+      background-color: #9f9f9f;
+    }
+
+    .chord-base-text {
+      width: 50%;
     }
   }
 

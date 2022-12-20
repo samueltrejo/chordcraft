@@ -35,8 +35,14 @@ import { FormBuilder, FormGroup } from '@angular/forms';
           <!-- menu buttons -->
           <div class="song-menu d-flex mt-2">
             <button *ngIf="isAdmin" class="btn btn-outline-primary btn-sm me-2" (click)="toggleEdit()">Edit Lyrics</button>
-            <button class="btn btn-outline-primary btn-sm me-2" (click)="transpose(false)">Transpose Down</button>
-            <button class="btn btn-outline-primary btn-sm me-2" (click)="transpose(true)">Transpose Up</button>
+            <button *ngIf="!isEdit" class="btn btn-outline-primary btn-sm me-2" (click)="transpose(false)">Transpose Down</button>
+            <button *ngIf="!isEdit" class="btn btn-outline-primary btn-sm me-2" (click)="transpose(true)">Transpose Up</button>
+            <button *ngIf="isEdit" class="btn btn-outline-primary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#chord-modal">Add Chord</button>
+          </div>
+
+          <!-- quick chord select -->
+          <div *ngIf="isEdit" class="chord-selection mt-2">
+            <button *ngFor="let chord of chords" class="btn btn-outline-primary btn-sm me-2" (click)="addQuickChord(chord)">{{chord}}</button>
           </div>
   
           <!-- song table -->
@@ -51,7 +57,10 @@ import { FormBuilder, FormGroup } from '@angular/forms';
           <!-- song textarea -->
           <div *ngIf="isEdit" class="mt-2">
             <!-- <textarea class="song-textarea" rows="{{song.lyrics.split('\n').length}}">{{song.lyrics}}</textarea> -->
-            <textarea #lyrics id="lyrics" class="song-textarea" formControlName="lyrics" placeholder="Lyrics" autofocus></textarea>
+            <textarea #lyrics id="lyrics" class="song-textarea" formControlName="lyrics" placeholder="Lyrics"
+              (focus)="setCaret($event)"
+              (click)="setCaret($event)"
+              (keyup)="setCaret($event)"></textarea>
           </div>
 
         </form>
@@ -69,7 +78,67 @@ import { FormBuilder, FormGroup } from '@angular/forms';
             <div class="modal-body position-relative">
               <!-- <input class="song-genre d-block" formControlName="title" autocomplete="off" placeholder="Genre"> -->
               <input #genre class="song-genre d-block" autocomplete="off" placeholder="Genre">
-              <i class="genre-submit bi bi-send-fill" (click)="addGenre(genre)"></i>
+              <i class="genre-submit bi bi-send-fill" data-bs-dismiss="modal" (click)="addGenre(genre)"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- chord modal -->
+      <div class="chord-modal modal fade" id="chord-modal">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <div class="modal-title" id="exampleModalLabel">Add chord</div>
+              <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+              <i class="bi bi-x-circle" data-bs-dismiss="modal"></i>
+            </div>
+            <div class="modal-body position-relative">
+
+              <form *ngIf="songForm" [formGroup]="chordDescriptorForm">
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text btn btn-outline-primary btn-sm chord-base-text" id="basic-addon1">{{chordBase}}</span>
+                  <input type="text" class="form-control chord-descriptor-input border-primary" formControlName="chordDescriptor">
+                </div>
+
+                <div class="btn-toolbar justify-content-center mt-1" role="toolbar">
+                  <div class="btn-group me-2" role="group" (click)="setChordBase($event)">
+                    <button type="button" class="btn btn-outline-primary btn-sm">A</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">A#</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">B</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">C</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">C#</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">D</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">D#</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">E</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">F</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">F#</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">G</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">G#</button>
+                  </div>
+                </div>
+  
+                <div class="btn-toolbar justify-content-center mt-1" role="toolbar">
+                  <div class="btn-group me-2" role="group" (click)="setChordDescriptor($event)">
+                    <button type="button" class="btn btn-outline-primary btn-sm">m</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">dim</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">aug</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">sus</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">5</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">6</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">7</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">9</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">m6</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">m7</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm">m9</button>
+                  </div>
+                </div>
+  
+                <div class="mt-1">
+                  <button class="btn btn-outline-primary btn-sm w-100" data-bs-dismiss="modal" (click)="addChord()">Add Chord</button>
+                </div>
+              </form>
+
             </div>
           </div>
         </div>
@@ -86,7 +155,12 @@ export class SongComponent implements OnInit {
   songsRef: DatabaseReference;
   songForm: FormGroup;
   isEdit: boolean = false;
-  isAdmin: boolean = false;
+  isAdmin: boolean = true;
+  chordBase: string = "A";
+  chords: string[] = [];
+  caret: number;
+
+  chordDescriptorForm: FormGroup = this.fb.group({chordDescriptor: ''});
 
   @ViewChild('lyrics') textArea;
 
@@ -111,15 +185,22 @@ export class SongComponent implements OnInit {
         this.song.genres = [];
       }
 
-      console.log(this.song);
+      if (this.song.chords == null) {
+        this.song.chords = [];
+      }
 
       this.songForm = this.fb.group({
         title: [this.song.title],
         artist: [this.song.artist],
         lyrics: [this.song.lyrics],
-        genres: [this.song.genres]
+        genres: [this.song.genres],
+        chords: [this.song.chords]
       });
     });
+  }
+
+  setCaret($event): void {
+    this.caret = $event.srcElement.selectionStart;
   }
 
   autoSave(): void {
@@ -143,10 +224,57 @@ export class SongComponent implements OnInit {
     }
   }
 
+  addChord(): void {
+    const chordDesc = this.chordDescriptorForm.controls['chordDescriptor'].value;
+    const chord = this.chordBase + chordDesc;
+    this.chords.push(chord);
+    let lyrics = this.songForm.controls['lyrics'].value;
+    lyrics = lyrics.slice(0, this.caret) + `[${chord}]` + lyrics.slice(this.caret);
+    this.songForm.controls['lyrics'].setValue(lyrics);
+    this.caret += chord.length + 2;
+    this.focusTextArea(500);
+  }
+
+  addQuickChord(chord: string): void {
+    let lyrics = this.songForm.controls['lyrics'].value;
+    lyrics = lyrics.slice(0, this.caret) + `[${chord}]` + lyrics.slice(this.caret);
+    this.songForm.controls['lyrics'].setValue(lyrics);
+    this.caret += chord.length + 2;
+    this.focusTextArea(500);
+  }
+
+  setChordBase($event): void {
+    if ($event.srcElement.localName == "button") {
+      this.chordBase = $event.srcElement.innerText;
+    }
+  }
+
+  setChordDescriptor($event): void {
+    if ($event.srcElement.localName == "button") {
+      const chordDesc = this.chordDescriptorForm.controls['chordDescriptor'].value;
+      if (chordDesc == $event.srcElement.innerText) {
+        this.chordDescriptorForm.controls['chordDescriptor'].setValue('');
+      } else {
+        this.chordDescriptorForm.controls['chordDescriptor'].setValue($event.srcElement.innerText);
+      }
+    }
+  }
+
   toggleEdit(): void {
     this.isEdit = !this.isEdit;
+    this.focusTextArea(100);
+  }
+
+  focusTextArea(delayMs: number): void {
     if (this.isEdit) {
-      setTimeout(x => document.getElementById('lyrics').focus(), 100);
+      setTimeout(x => {
+        const textArea = document.getElementById('lyrics') as HTMLTextAreaElement;
+        if (this.caret != null) {
+          textArea.setSelectionRange(this.caret, this.caret);
+        }
+        textArea.focus();
+
+      }, delayMs);
     }
   }
 
