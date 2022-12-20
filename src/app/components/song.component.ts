@@ -154,7 +154,7 @@ export class SongComponent implements OnInit {
   song: Song;
   songsRef: DatabaseReference;
   songForm: FormGroup;
-  isEdit: boolean = false;
+  isEdit: boolean = true;
   isAdmin: boolean = true;
   chordBase: string = "A";
   chords: string[] = [];
@@ -189,6 +189,8 @@ export class SongComponent implements OnInit {
         this.song.chords = [];
       }
 
+      this.errorCheckLyrics();
+
       this.songForm = this.fb.group({
         title: [this.song.title],
         artist: [this.song.artist],
@@ -197,6 +199,10 @@ export class SongComponent implements OnInit {
         chords: [this.song.chords]
       });
     });
+  }
+
+  errorCheckLyrics(): void {
+    // this.song
   }
 
   setCaret($event): void {
