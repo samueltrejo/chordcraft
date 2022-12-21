@@ -178,17 +178,22 @@ export class SongComponent implements OnInit {
   getSongs(): void {
     get(child(this.songsRef, '/' + this.songId)).then(snapshot => {
       const data: Song = snapshot.val();
+
+      //error check data
+      // this.isEdit = true;
+      this.hasErrorInLyrics(data.lyrics);
+      
       data.id = this.songId;
       this.song = data;
-
+      
       if (this.song.genres == null) {
         this.song.genres = [];
       }
-
+      
       if (this.song.chords == null) {
         this.song.chords = [];
       }
-
+      
       this.songForm = this.fb.group({
         title: [this.song.title],
         artist: [this.song.artist],
@@ -197,6 +202,26 @@ export class SongComponent implements OnInit {
         chords: [this.song.chords]
       });
     });
+  }
+
+  hasErrorInLyrics(lyrics: string): boolean {
+    const numOfLeftBracket = (lyrics.match(/\[/g)||[]).length;
+    const numOfRightBracket = (lyrics.match(/\]/g)||[]).length;
+    const lastLeftBracketPosition = lyrics.lastIndexOf('[');
+    const lastRightBracketPosition = lyrics.lastIndexOf(']');
+
+    const isBracketCountError = numOfLeftBracket != numOfRightBracket;
+    const isBracketPositionError = lastLeftBracketPosition > lastRightBracketPosition;
+
+    
+    if (isBracketCountError || isBracketPositionError) {
+      console.log(1)
+      this.isEdit = true;
+      return true;
+    } else {
+      console.log(2)
+      return false;
+    }
   }
 
   setCaret($event): void {
@@ -261,8 +286,10 @@ export class SongComponent implements OnInit {
   }
 
   toggleEdit(): void {
-    this.isEdit = !this.isEdit;
-    this.focusTextArea(100);
+    if (!this.hasErrorInLyrics(this.songForm.controls['lyrics'].value)) {
+      this.isEdit = !this.isEdit;
+      this.focusTextArea(100);
+    }
   }
 
   focusTextArea(delayMs: number): void {
