@@ -42,7 +42,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 
           <!-- quick chord select -->
           <div *ngIf="isEdit" class="chord-selection mt-2">
-            <button *ngFor="let chord of chords" class="btn btn-outline-primary btn-sm me-2" (click)="addQuickChord(chord)">{{chord}}</button>
+            <button *ngFor="let chord of song.chords" class="btn btn-outline-primary btn-sm me-2" (click)="addQuickChord(chord)">{{chord}}</button>
           </div>
   
           <!-- song table -->
@@ -157,7 +157,6 @@ export class SongComponent implements OnInit {
   isEdit: boolean = false;
   isAdmin: boolean = true;
   chordBase: string = "A";
-  chords: string[] = [];
   caret: number;
 
   chordDescriptorForm: FormGroup = this.fb.group({chordDescriptor: ''});
@@ -185,6 +184,7 @@ export class SongComponent implements OnInit {
       
       data.id = this.songId;
       this.song = data;
+      console.log(data);
       
       if (this.song.genres == null) {
         this.song.genres = [];
@@ -252,12 +252,14 @@ export class SongComponent implements OnInit {
   addChord(): void {
     const chordDesc = this.chordDescriptorForm.controls['chordDescriptor'].value;
     const chord = this.chordBase + chordDesc;
-    this.chords.push(chord);
+    if (this.song.chords)
+    this.song.chords.push(chord);
     let lyrics = this.songForm.controls['lyrics'].value;
     lyrics = lyrics.slice(0, this.caret) + `[${chord}]` + lyrics.slice(this.caret);
     this.songForm.controls['lyrics'].setValue(lyrics);
     this.caret += chord.length + 2;
     this.focusTextArea(500);
+    this.autoSave();
   }
 
   addQuickChord(chord: string): void {
@@ -266,6 +268,7 @@ export class SongComponent implements OnInit {
     this.songForm.controls['lyrics'].setValue(lyrics);
     this.caret += chord.length + 2;
     this.focusTextArea(500);
+    this.autoSave();
   }
 
   setChordBase($event): void {
