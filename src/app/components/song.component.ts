@@ -42,7 +42,10 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 
           <!-- quick chord select -->
           <div *ngIf="isEdit" class="chord-selection mt-2">
-            <button *ngFor="let chord of song.chords" class="btn btn-outline-primary btn-sm me-2" (click)="addQuickChord(chord)">{{chord}}</button>
+            <button *ngFor="let chord of song.chords" class="position-relative btn btn-outline-primary btn-sm me-3" (click)="handleQuickChord($event, chord)">
+              {{chord}}
+              <i class="position-absolute bi bi-x chord-xbtn"></i>
+            </button>
           </div>
   
           <!-- song table -->
@@ -57,7 +60,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
           <!-- song textarea -->
           <div *ngIf="isEdit" class="mt-2">
             <!-- <textarea class="song-textarea" rows="{{song.lyrics.split('\n').length}}">{{song.lyrics}}</textarea> -->
-            <textarea #lyrics id="lyrics" class="song-textarea" formControlName="lyrics" placeholder="Lyrics"
+            <textarea #lyrics id="lyrics" class="song-textarea" formControlName="lyrics" placeholder="Lyrics" autofocus
               (focus)="setCaret($event)"
               (click)="setCaret($event)"
               (keyup)="setCaret($event)"></textarea>
@@ -179,12 +182,10 @@ export class SongComponent implements OnInit {
       const data: Song = snapshot.val();
 
       //error check data
-      // this.isEdit = true;
       this.hasErrorInLyrics(data.lyrics);
       
       data.id = this.songId;
       this.song = data;
-      console.log(data);
       
       if (this.song.genres == null) {
         this.song.genres = [];
@@ -194,6 +195,7 @@ export class SongComponent implements OnInit {
         this.song.chords = [];
       }
       
+      // TODO: look into fix for, songform is getting updated without updating form because this.song is still it's reference,
       this.songForm = this.fb.group({
         title: [this.song.title],
         artist: [this.song.artist],
@@ -215,11 +217,9 @@ export class SongComponent implements OnInit {
 
     
     if (isBracketCountError || isBracketPositionError) {
-      console.log(1)
       this.isEdit = true;
       return true;
     } else {
-      console.log(2)
       return false;
     }
   }
@@ -252,8 +252,9 @@ export class SongComponent implements OnInit {
   addChord(): void {
     const chordDesc = this.chordDescriptorForm.controls['chordDescriptor'].value;
     const chord = this.chordBase + chordDesc;
-    if (this.song.chords)
-    this.song.chords.push(chord);
+    if (!this.song.chords.includes(chord)) {
+      this.song.chords.push(chord);
+    }
     let lyrics = this.songForm.controls['lyrics'].value;
     lyrics = lyrics.slice(0, this.caret) + `[${chord}]` + lyrics.slice(this.caret);
     this.songForm.controls['lyrics'].setValue(lyrics);
@@ -262,13 +263,24 @@ export class SongComponent implements OnInit {
     this.autoSave();
   }
 
-  addQuickChord(chord: string): void {
-    let lyrics = this.songForm.controls['lyrics'].value;
-    lyrics = lyrics.slice(0, this.caret) + `[${chord}]` + lyrics.slice(this.caret);
-    this.songForm.controls['lyrics'].setValue(lyrics);
-    this.caret += chord.length + 2;
+  handleQuickChord($event, chord: string): void {
+    const elementName = $event.srcElement.localName
+    if (elementName == 'button') {
+      let lyrics = this.songForm.controls['lyrics'].value;
+      lyrics = lyrics.slice(0, this.caret) + `[${chord}]` + lyrics.slice(this.caret);
+      this.songForm.controls['lyrics'].setValue(lyrics);
+      this.caret += chord.length + 2;
+    } else if (elementName == 'i') {
+      this.song.chords = this.song.chords.filter(x => x != chord);
+      this.songForm.controls['chords'].setValue(this.song.chords);
+    }
+
     this.focusTextArea(500);
     this.autoSave();
+  }
+
+  removeQuickChord(chord: string): void {
+    console.log(chord);
   }
 
   setChordBase($event): void {

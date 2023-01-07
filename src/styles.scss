@@ -112,7 +112,7 @@ body::-webkit-scrollbar {
       // -ms-overflow-style: none;
       // scrollbar-width: none;
       background-color: $colorGrey;
-      line-height: 18px;
+      line-height: 15px;
       // border-top-right-radius: 9px;
       // border-top: 4px solid $colorBlue;
       // border-right: 4px solid $colorBlue;
@@ -127,6 +127,15 @@ body::-webkit-scrollbar {
     // .song-textarea::-webkit-scrollbar, .song-table::-webkit-scrollbar {
     //   display: none;
     // }
+
+    .chord-xbtn {
+      top: -6px;
+      border: 1px solid $colorBlue;
+      border-radius: 7px;
+      line-height: 5px;
+      background-color: $colorGrey;
+      // color: red;
+    }
   }
 
   .badge {
