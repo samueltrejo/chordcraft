@@ -19,6 +19,8 @@ export class FirebaseService {
       // Initialize Firebase
       this.app = initializeApp(fbConfig);
       this.db = getDatabase();
+
+      // Initialize Auth
       this.google = new GoogleAuthProvider();
   }
 
