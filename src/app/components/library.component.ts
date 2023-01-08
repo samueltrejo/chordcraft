@@ -8,6 +8,8 @@ import { Router } from '@angular/router';
   selector: 'app-library',
   template: `
   <div class="library container mt-5">
+    <button class="btn btn-primary" (click)="googleSignIn()">sign in</button><br>
+    <button class="btn btn-primary" (click)="googleSignOut()">sign out</button>
     <ul class="list-group">
       <li *ngFor="let song of songs" class="list-group-item" routerLink="{{song.id}}">{{song.title}}</li>
       <li class="list-group-item lib-song" (click)="newSong()">new song +</li>
@@ -27,6 +29,14 @@ export class LibraryComponent implements OnInit {
 
   ngOnInit(): void {
     this.getSongs();
+  }
+
+  googleSignIn() {
+    this.firebaseService.googleSignIn();
+  }
+
+  googleSignOut() {
+    this.firebaseService.googleSignOut();
   }
 
   getSongs(): void {
