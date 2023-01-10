@@ -4,17 +4,21 @@ import { Song } from '../models/song';
 import { FirebaseApp, initializeApp } from 'firebase/app';
 import { getDatabase, ref, onValue, Database, DatabaseReference} from "firebase/database";
 import { fbConfig } from '../models/fbConfig';
-import { GoogleAuthProvider, getAuth, signInWithRedirect, getRedirectResult, Auth, signInWithPopup, onAuthStateChanged, signOut } from 'firebase/auth';
+import { GoogleAuthProvider, getAuth, signInWithRedirect, getRedirectResult, Auth, signInWithPopup, onAuthStateChanged, signOut, User } from 'firebase/auth';
+import { Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FirebaseService {
-  private path = '/songs';
+  private readonly path = '/songs';
   private app: FirebaseApp
   private db: Database;
   private google: GoogleAuthProvider;
   private auth: Auth;
+
+  user: User;
+  userObserver: Subject<User> = new Subject<User>();
 
   constructor() {
     // Initialize Firebase
@@ -26,20 +30,13 @@ export class FirebaseService {
     this.auth = getAuth();
 
     // Get Auth Info
-    onAuthStateChanged(this.auth, (user) => {
-      console.log('test');
-      if (user) {
-        // User is signed in, see docs for a list of available properties
-        // https://firebase.google.com/docs/reference/js/firebase.User
-        const uid = user.uid;
-        console.log(user);
-        // ...
-      } else {
-        // User is signed out
-        // ...
-      }
-    });
+    this.userObserver.subscribe(value => this.user = value);
+    onAuthStateChanged(this.auth, (user) => { this.userObserver.next(user) });
   }
+
+  // getUser(): User {
+  //   return this.user;
+  // }
 
   googleSignIn() {
     signInWithRedirect(this.auth, this.google);
@@ -54,10 +51,10 @@ export class FirebaseService {
   }
 
   getSongsRef(): DatabaseReference {
-    return ref(this.db, '/songs');
+    return ref(this.db, this.path);
   }
 
   getSongRef(songId: string): DatabaseReference {
-    return ref(this.db, '/songs/' + songId);
+    return ref(this.db, this.path + "/" + songId);
   }
 }

@@ -18,7 +18,8 @@ $fontSizeLg: 2rem;
 $fontFamHeebo: 'Heebo', sans-serif;
 
 body {
-  background-color: $colorDark;
+  // background-color: $colorDark;
+  background-color: #212529;
   font-size: $fontSizeSm;
 
   -ms-overflow-style: none;
@@ -40,7 +41,7 @@ body::-webkit-scrollbar {
   color: $colorDark;
 
   .list-group-item {
-    background-color: $colorGrey;
+    // background-color: $colorGrey;
     cursor: pointer;
   }
 }

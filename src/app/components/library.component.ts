@@ -7,12 +7,13 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-library',
   template: `
-  <div class="library container mt-5">
-    <button class="btn btn-primary" (click)="googleSignIn()">sign in</button><br>
-    <button class="btn btn-primary" (click)="googleSignOut()">sign out</button>
+  <app-navbar></app-navbar>
+  <div class="library container mt-3">
+    <!-- <button class="btn btn-primary" (click)="googleSignIn()">sign in</button><br>
+    <button class="btn btn-primary" (click)="googleSignOut()">sign out</button> -->
     <ul class="list-group">
-      <li *ngFor="let song of songs" class="list-group-item" routerLink="{{song.id}}">{{song.title}}</li>
-      <li class="list-group-item lib-song" (click)="newSong()">new song +</li>
+      <li *ngFor="let song of songs" class="list-group-item bg-secondary" routerLink="{{song.id}}">{{song.title}}</li>
+      <li class="list-group-item lib-song bg-secondary" (click)="newSong()">new song +</li>
     </ul>
   </div>
   `,
