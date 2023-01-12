@@ -8,7 +8,6 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 @Component({
   selector: 'app-song',
   template: `
-    <app-navbar></app-navbar>
     <div *ngIf="song" class="song">
 
     <!-- <div class="position-relative">

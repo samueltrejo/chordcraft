@@ -7,8 +7,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-library',
   template: `
-  <app-navbar></app-navbar>
-  <div class="library container">
+  <div class="library container p-0">
     <!-- <button class="btn btn-primary" (click)="googleSignIn()">sign in</button><br>
     <button class="btn btn-primary" (click)="googleSignOut()">sign out</button> -->
     <ul class="list-group">
@@ -44,7 +43,6 @@ export class LibraryComponent implements OnInit {
     this.songsRef = this.firebaseService.getSongsRef();
     onValue(this.songsRef, (snapshot) => {
       const data = snapshot.val();
-      console.log(data);
       this.songs = Object.keys(data).map(songId => {
         data[songId].id = songId;
         return data[songId];
