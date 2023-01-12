@@ -8,24 +8,25 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 @Component({
   selector: 'app-song',
   template: `
+    <app-navbar></app-navbar>
     <div *ngIf="song" class="song">
 
-    <div class="position-relative">
+    <!-- <div class="position-relative">
       <i class="bi bi-incognito" (click)="toggleAdmin()"></i>
-    </div>
+    </div> -->
 
       <div class="song-container container p-4">
         <form *ngIf="songForm" [formGroup]="songForm" (keyup)="autoSave()">
   
           <!-- song info -->
           <div *ngIf="isAdmin" id="song-genres" class="mt-2">
-            <span *ngFor="let genre of song.genres" class="badge bg-primary me-2">{{genre}} <i class="bi bi-x" (click)="removeGenre(genre)"></i></span>
-            <span class="badge bg-primary" data-bs-toggle="modal" data-bs-target="#genre-modal">Add Genre<i class="bi bi-plus"></i></span>
+            <span *ngFor="let genre of song.genres" class="badge me-2">{{genre}} <i class="bi bi-x" (click)="removeGenre(genre)"></i></span>
+            <span class="badge" data-bs-toggle="modal" data-bs-target="#genre-modal">Add Genre<i class="bi bi-plus"></i></span>
           </div>
 
           <div *ngIf="isAdmin" class="song-info">
-            <input class="song-title d-block" formControlName="title" autocomplete="off" placeholder="Title">
-            <input class="song-artist d-block" formControlName="artist" autocomplete="off" placeholder="Artist">
+            <input class="song-title d-block mt-2" formControlName="title" autocomplete="off" placeholder="Title">
+            <input class="song-artist d-block mt-2" formControlName="artist" autocomplete="off" placeholder="Artist">
           </div>
           <div *ngIf="!isAdmin" class="song-info">
             <input class="song-title d-block" formControlName="title" autocomplete="off" placeholder="Title" disabled>
@@ -44,12 +45,12 @@ import { FormBuilder, FormGroup } from '@angular/forms';
           <div *ngIf="isEdit" class="chord-selection mt-2">
             <button *ngFor="let chord of song.chords" class="position-relative btn btn-outline-primary btn-sm me-3" (click)="handleQuickChord($event, chord)">
               {{chord}}
-              <i class="position-absolute bi bi-x chord-xbtn"></i>
+              <i class="position-absolute bi bi-x corner-btn"></i>
             </button>
           </div>
   
           <!-- song table -->
-          <div *ngIf="!isEdit" class="song-table mt-2">
+          <div *ngIf="!isEdit" class="song-table bg-secondary mt-3">
             <table>
               <tbody *ngFor="let lyric of songForm.value.lyrics.split('\n')">
                 <app-lyric [lyric]="lyric"></app-lyric>
@@ -101,7 +102,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
               <form *ngIf="songForm" [formGroup]="chordDescriptorForm">
                 <div class="input-group input-group-sm">
                   <span class="input-group-text btn btn-outline-primary btn-sm chord-base-text" id="basic-addon1">{{chordBase}}</span>
-                  <input type="text" class="form-control chord-descriptor-input border-primary" formControlName="chordDescriptor">
+                  <input type="text" class="form-control chord-descriptor-input" formControlName="chordDescriptor">
                 </div>
 
                 <div class="btn-toolbar justify-content-center mt-1" role="toolbar">
