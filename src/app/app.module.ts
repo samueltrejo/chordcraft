@@ -7,6 +7,7 @@ import { AppComponent } from './app.component';
 import { LibraryComponent } from './components/library.component';
 import { SongComponent } from './components/song.component';
 import { LyricComponent } from './components/lyric.component';
+import { NavbarComponent } from './components/navbar.component';
 
 @NgModule({
   declarations: [
@@ -14,6 +15,7 @@ import { LyricComponent } from './components/lyric.component';
     LibraryComponent,
     SongComponent,
     LyricComponent,
+    NavbarComponent,
     // LyricComponent
   ],
   imports: [

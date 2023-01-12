@@ -3,10 +3,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Dancing+Script&family=Fira+Mono&family=Gurajada&family=Heebo:wght@100;200;300;400&family=Inter&family=Playfair+Display&family=Qwitcher+Grypen:wght@400;700&family=Sacramento&family=Ubuntu:ital,wght@0,300;0,400;1,300;1,400&family=Work+Sans:wght@300&display=swap');
 
 // colors
-$colorBlue: #427dde;
+$colorBlue: #78A2CC;
+$colorBlueOp50: #7aa3cd80;
 $colorLight: #e6e6e6;
 $colorDark: #404040;
-$colorGrey: #9f9f9f;
+$colorDarker: #212529;
+$colorGrey: #6c757d;
+$colorAccent: $colorBlue;
+$colorAccentOp50: $colorBlueOp50;
 
 // font sizes
 $fontSizeXs: .7rem;
@@ -18,7 +22,9 @@ $fontSizeLg: 2rem;
 $fontFamHeebo: 'Heebo', sans-serif;
 
 body {
-  background-color: $colorDark;
+  // background-color: $colorDark;
+  background-color: $colorDarker;
+  color: $colorDarker;
   font-size: $fontSizeSm;
 
   -ms-overflow-style: none;
@@ -29,15 +35,31 @@ body::-webkit-scrollbar {
   display: none;
 }
 
+/* Globals */
+.btn-outline-primary {
+  color: $colorAccent;
+  border-color: $colorAccent;
+}
+.btn-outline-primary:hover {
+  color: $colorLight;
+  background-color: $colorAccent;
+  border-color: $colorAccent;
+}
+
+.btn-outline-primary:focus,
+.btn-outline-primary:active:focus {
+  box-shadow: 0 0 0 0.25rem $colorAccentOp50;
+}
+
 /* Navbar */
-.nav {
-  background-color: $colorGrey;
+.navbar {
+  font-family: $fontFamHeebo;
+  color: $colorLight;
 }
 
 /* Library */
 .library {
   font-family: $fontFamHeebo;
-  color: $colorDark;
 
   .list-group-item {
     background-color: $colorGrey;
@@ -48,8 +70,7 @@ body::-webkit-scrollbar {
 /* Song */
 .song {
   font-family: $fontFamHeebo;
-  color: $colorDark;
-
+  
   .song-container {
     background-color: $colorGrey;
     border-radius: 5px;
@@ -60,9 +81,14 @@ body::-webkit-scrollbar {
     0 16px 32px rgba(0,0,0,0.07), 
     0 32px 64px rgba(0,0,0,0.07);
 
+    .badge {
+      background-color: $colorAccent;
+      color: $colorLight;
+    }
+
     .song-title, .song-artist {
       font-family: $fontFamHeebo;
-      color: $colorDark;
+      color: $colorDarker;
       outline: none;
       border: none;
       background-color: transparent;
@@ -70,17 +96,19 @@ body::-webkit-scrollbar {
 
     .song-title {
       font-size: $fontSizeLg;
-      border-bottom: 2px solid transparent;
+      border: 2px solid transparent;
+      border-radius: 5px;
     }
 
     .song-artist {
       font-size: $fontSizeMd;
-      border-bottom: 2px solid transparent;
+      border: 2px solid transparent;
+      border-radius: 5px;
     }
 
-    .song-title:focus, .song-artist:focus {
-      border-bottom: 2px solid $colorBlue;
-      // width: 400px;
+    .song-title:focus, .song-title:hover,
+    .song-artist:focus, .song-artist:hover {
+      border: 2px solid $colorAccent;
     }
 
     .song-textarea {
@@ -88,38 +116,30 @@ body::-webkit-scrollbar {
       height: 600px;
       box-sizing: border-box;
       background-color: $colorGrey;
-      color: $colorDark;
+      color: $colorDarker;
       border: none;
       border-radius: 9px;
       padding: 5px;
-      // border-top-right-radius: 9px;
-      // border-top: 4px solid $colorBlue;
-      // border-right: 4px solid $colorBlue;
       resize: none;
       outline: none;
       -ms-overflow-style: none;
       scrollbar-width: none;
-      border: 1px solid #858585;
+      border: 1px solid $colorAccent;
     }
 
     .song-textarea:focus {
-      border-color: rgb(13 110 253 / 25%);
-      box-shadow: 0 0 0 0.25rem rgb(13 110 253 / 25%);
+      border-color: $colorAccentOp50;
+      box-shadow: 0 0 0 0.25rem $colorAccentOp50;
     }
 
     .song-table {
       // overflow: scroll;
       // -ms-overflow-style: none;
       // scrollbar-width: none;
-      background-color: $colorGrey;
-      line-height: 18px;
-      // border-top-right-radius: 9px;
-      // border-top: 4px solid $colorBlue;
-      // border-right: 4px solid $colorBlue;
+      line-height: 15px;
 
       td {
         white-space: nowrap;
-        // padding: 0px;
         white-space: pre;
       }
     }
@@ -127,6 +147,20 @@ body::-webkit-scrollbar {
     // .song-textarea::-webkit-scrollbar, .song-table::-webkit-scrollbar {
     //   display: none;
     // }
+
+    .corner-btn {
+      top: -6px;
+      border: 1px solid $colorAccent;
+      border-radius: 7px;
+      line-height: 5px;
+      background-color: $colorGrey;
+    }
+
+    .corner-btn:hover {
+      color: $colorLight;
+      background-color: $colorAccent;
+      border-color: $colorAccent;
+    }
   }
 
   .badge {
@@ -153,7 +187,7 @@ body::-webkit-scrollbar {
       outline: none;
       border: none;
       background-color: transparent;
-      border-bottom: 2px solid $colorBlue;
+      border-bottom: 2px solid $colorAccent;
     }
 
     .genre-submit {
@@ -164,7 +198,7 @@ body::-webkit-scrollbar {
   
     .bi {
       // font-size: $fontSizeLg;
-      color: $colorBlue;
+      color: $colorAccent;
       cursor: pointer;
     }
 
@@ -173,7 +207,13 @@ body::-webkit-scrollbar {
     }
 
     .chord-descriptor-input {
-      background-color: #9f9f9f;
+      border-color: $colorAccent;
+      background-color: $colorGrey;
+    }
+
+    .chord-descriptor-input:focus {
+      border-color: $colorAccentOp50;
+      box-shadow: 0 0 0 0.25rem $colorAccentOp50;
     }
 
     .chord-base-text {
@@ -183,7 +223,7 @@ body::-webkit-scrollbar {
 
   /* Lyrics */
   .chord button {
-    color: $colorDark;
+    color: $colorDarker;
     padding: 0px;
     // padding-left: 2px;
     padding-right: 3px;
@@ -192,6 +232,6 @@ body::-webkit-scrollbar {
   }
 
   .chord button:hover {
-    color: $colorBlue;
+    color: $colorAccent;
   }
 }

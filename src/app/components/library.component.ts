@@ -7,7 +7,9 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-library',
   template: `
-  <div class="library container mt-5">
+  <div class="library container p-0">
+    <!-- <button class="btn btn-primary" (click)="googleSignIn()">sign in</button><br>
+    <button class="btn btn-primary" (click)="googleSignOut()">sign out</button> -->
     <ul class="list-group">
       <li *ngFor="let song of songs" class="list-group-item" routerLink="{{song.id}}">{{song.title}}</li>
       <li class="list-group-item lib-song" (click)="newSong()">new song +</li>
@@ -29,11 +31,18 @@ export class LibraryComponent implements OnInit {
     this.getSongs();
   }
 
+  googleSignIn() {
+    this.firebaseService.googleSignIn();
+  }
+
+  googleSignOut() {
+    this.firebaseService.googleSignOut();
+  }
+
   getSongs(): void {
     this.songsRef = this.firebaseService.getSongsRef();
     onValue(this.songsRef, (snapshot) => {
       const data = snapshot.val();
-      console.log(data);
       this.songs = Object.keys(data).map(songId => {
         data[songId].id = songId;
         return data[songId];
