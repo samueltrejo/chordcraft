@@ -3,6 +3,7 @@ import { FirebaseService } from 'src/app/services/firebase.service';
 import { Song } from 'src/app/models/song';
 import { DatabaseReference, onValue, push, child } from 'firebase/database';
 import { Router } from '@angular/router';
+import { User } from 'firebase/auth';
 
 @Component({
   selector: 'app-library',
@@ -22,21 +23,34 @@ import { Router } from '@angular/router';
 export class LibraryComponent implements OnInit {
   songs: any;
   songsRef: DatabaseReference;
+  isAuthenticated: boolean = false;
+  user: User;
 
   constructor(
     private firebaseService: FirebaseService,
     private router: Router) { }
 
   ngOnInit(): void {
-    this.getSongs();
+    // this.getSongs();
+    this.getUser();
   }
 
-  googleSignIn() {
-    this.firebaseService.googleSignIn();
-  }
+  getUser(): void {
+    if (this.firebaseService.user) {
+      this.isAuthenticated = true;
+    } else {
+      this.firebaseService.userObserver.subscribe(user => {
+        console.log(user);
+        if (user) {
+          this.user = user;
+          this.isAuthenticated = true;
+        } else {
+          this.user = null;
+          this.isAuthenticated = false;
+        }
+      });
+    }
 
-  googleSignOut() {
-    this.firebaseService.googleSignOut();
   }
 
   getSongs(): void {

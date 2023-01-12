@@ -44,9 +44,9 @@ export class FirebaseService {
 
   googleSignOut() {
     signOut(this.auth).then(() => {
-      console.log('Sign-out successful.');
+      this.user = null;
     }).catch((error) => {
-      // An error happened.
+      console.log('An error happened while logging out.');
     });
   }
 

@@ -43,15 +43,19 @@ export class NavbarComponent implements OnInit {
 
   getUser(): void {
     if (this.firebaseService.user) {
-      this.isAuthenticated = false;
+      this.isAuthenticated = true;
+    } else {
+      this.firebaseService.userObserver.subscribe(user => {
+        if (user) {
+          this.user = user;
+          this.isAuthenticated = true;
+        } else {
+          this.user = null;
+          this.isAuthenticated = false;
+        }
+      });
     }
 
-    this.firebaseService.userObserver.subscribe(user => {
-      if (user) {
-        this.user = user;
-        this.isAuthenticated = true;
-      }
-    })
   }
 
   googleSignIn() {
