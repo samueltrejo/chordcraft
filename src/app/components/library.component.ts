@@ -1,15 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { Song } from 'src/app/models/song';
-import { DatabaseReference, onValue, push, child } from 'firebase/database';
 import { Router } from '@angular/router';
+import { push } from 'firebase/database';
 
 @Component({
   selector: 'app-library',
   template: `
   <div class="library container p-0">
-    <!-- <button class="btn btn-primary" (click)="googleSignIn()">sign in</button><br>
-    <button class="btn btn-primary" (click)="googleSignOut()">sign out</button> -->
     <ul class="list-group">
       <li *ngFor="let song of songs" class="list-group-item" routerLink="{{song.id}}">{{song.title}}</li>
       <li class="list-group-item lib-song" (click)="newSong()">new song +</li>
@@ -20,45 +18,29 @@ import { Router } from '@angular/router';
   ]
 })
 export class LibraryComponent implements OnInit {
-  songs: any;
-  songsRef: DatabaseReference;
+  songs: Song[];
+  isAuth: boolean = false;
 
   constructor(
     private firebaseService: FirebaseService,
     private router: Router) { }
 
   ngOnInit(): void {
-    this.getSongs();
+    this.populateData();
   }
 
-  googleSignIn() {
-    this.firebaseService.googleSignIn();
-  }
-
-  googleSignOut() {
-    this.firebaseService.googleSignOut();
-  }
-
-  getSongs(): void {
-    this.songsRef = this.firebaseService.getSongsRef();
-    onValue(this.songsRef, (snapshot) => {
-      const data = snapshot.val();
-      this.songs = Object.keys(data).map(songId => {
-        data[songId].id = songId;
-        return data[songId];
-      });
-    })
+  populateData(): void {
+    this.isAuth = this.firebaseService.isAuth;
+    this.songs = this.firebaseService.songs;
   }
 
   newSong(): void {
     const song: Song = {
-      title: 'my new song...',
-      artist: '',
-      // genres: [],
-      lyrics: ''
+      title: 'My Awsome Song',
+      artist: this.firebaseService.user.displayName,
+      lyrics: 'My [G]awsome song lyrics'
     }
-
-    push(this.songsRef, song).then(x => this.router.navigate([x.key]));
+    push(this.firebaseService.songsRef, song).then(x => this.router.navigate([x.key]));
   }
 
 }
