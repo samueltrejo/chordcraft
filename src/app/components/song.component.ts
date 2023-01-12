@@ -1,5 +1,5 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { child, DatabaseReference, get, ref, set } from "firebase/database";
 import { Song } from '../models/song';
@@ -9,10 +9,6 @@ import { FormBuilder, FormGroup } from '@angular/forms';
   selector: 'app-song',
   template: `
     <div *ngIf="song" class="song">
-
-    <!-- <div class="position-relative">
-      <i class="bi bi-incognito" (click)="toggleAdmin()"></i>
-    </div> -->
 
       <div class="song-container container p-4">
         <form *ngIf="songForm" [formGroup]="songForm" (keyup)="autoSave()">
@@ -153,8 +149,10 @@ import { FormBuilder, FormGroup } from '@angular/forms';
   ]
 })
 export class SongComponent implements OnInit {
-  songId: string;
   song: Song;
+  songId: string;
+  isAuth: boolean = false;
+
   songsRef: DatabaseReference;
   songForm: FormGroup;
   isEdit: boolean = false;
@@ -169,24 +167,25 @@ export class SongComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
+    private router: Router,
     private firebaseService: FirebaseService) { }
 
   ngOnInit(): void {
     this.songId = this.route.snapshot.paramMap.get("songId");
-    this.songsRef = this.firebaseService.getSongsRef();
-    this.getSongs();
+    this.getSong();
   }
 
-  getSongs(): void {
-    get(child(this.songsRef, '/' + this.songId)).then(snapshot => {
+  getSong(): void {
+    get(child(this.firebaseService.songsRef, '/' + this.songId)).then(snapshot => {
       const data: Song = snapshot.val();
 
-      //error check data
+      // Check song for errors eg. bracket issues.
+      // This locks textarea to prevent table issues, and allows fixing in editor.
       this.hasErrorInLyrics(data.lyrics);
-      
+
       data.id = this.songId;
       this.song = data;
-      
+
       if (this.song.genres == null) {
         this.song.genres = [];
       }
@@ -194,7 +193,7 @@ export class SongComponent implements OnInit {
       if (this.song.chords == null) {
         this.song.chords = [];
       }
-      
+
       // TODO: look into fix for, songform is getting updated without updating form because this.song is still it's reference,
       this.songForm = this.fb.group({
         title: [this.song.title],
@@ -229,8 +228,6 @@ export class SongComponent implements OnInit {
   }
 
   autoSave(): void {
-    console.log(this.songForm.value);
-
     const songRef = this.firebaseService.getSongRef(this.songId);
     set(songRef, this.songForm.value);
   }
@@ -279,10 +276,6 @@ export class SongComponent implements OnInit {
     this.autoSave();
   }
 
-  removeQuickChord(chord: string): void {
-    console.log(chord);
-  }
-
   setChordBase($event): void {
     if ($event.srcElement.localName == "button") {
       this.chordBase = $event.srcElement.innerText;
@@ -320,10 +313,6 @@ export class SongComponent implements OnInit {
     }
   }
 
-  toggleAdmin(): void {
-    this.isAdmin = !this.isAdmin;
-  }
-
   transpose(transposeUp: boolean): void {
     const transposeVal = transposeUp ? 1 : -1;
     const notes = ['a', 'a#', 'b', 'c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a'];
@@ -354,7 +343,6 @@ export class SongComponent implements OnInit {
       transposedLyrics += chord + ']';
 
       lyrics = lyrics.slice(bracketPos2 + 1);
-      console.log(lyrics);
 
       if (lyrics.indexOf('[') == -1) {
         if (lyrics.length != 0) {
