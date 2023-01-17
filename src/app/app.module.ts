@@ -8,6 +8,7 @@ import { LibraryComponent } from './components/library.component';
 import { SongComponent } from './components/song.component';
 import { LyricComponent } from './components/lyric.component';
 import { NavbarComponent } from './components/navbar.component';
+import { ChordComponent } from './components/chord.component';
 
 @NgModule({
   declarations: [
@@ -16,6 +17,7 @@ import { NavbarComponent } from './components/navbar.component';
     SongComponent,
     LyricComponent,
     NavbarComponent,
+    ChordComponent,
     // LyricComponent
   ],
   imports: [

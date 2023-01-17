@@ -6,7 +6,8 @@ import { Component, Input, OnInit } from '@angular/core';
     <tbody>
       <tr class="chords">
         <td *ngFor="let chord of chords" class="chord pe-1">
-          <button>{{chord}}</button>
+          <!-- <button>{{chord}}</button> -->
+          <app-chord [chordString]="chord"></app-chord>
         </td>
       </tr>
       <tr class="lyrics">
