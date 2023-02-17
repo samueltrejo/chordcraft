@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { Song } from '../models/song';
 
 import { initializeApp } from 'firebase/app';
-import { getDatabase, ref, onValue, Database, DatabaseReference, off} from "firebase/database";
+import { getDatabase, ref, onValue, Database, DatabaseReference, remove } from "firebase/database";
 import { fbConfig } from '../models/fbConfig';
-import { GoogleAuthProvider, getAuth, signInWithRedirect, getRedirectResult, Auth, signInWithPopup, onAuthStateChanged, signOut, User } from 'firebase/auth';
+import { GoogleAuthProvider, getAuth, signInWithRedirect, Auth, onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { Subject } from 'rxjs';
 import { Howl } from 'howler';
 
@@ -173,6 +173,7 @@ export class FirebaseService {
 
   songsRef: DatabaseReference;
   songs: Song[];
+  sharedSongs: Song[];
   songsObserver: Subject<Song[]> = new Subject<Song[]>();
 
   constructor() {
@@ -210,19 +211,44 @@ export class FirebaseService {
   }
 
   initSongsRef(uid: string): void {
-    this.songsRef = ref(this.db, '/' + uid + this.path);
+    // retreiving songs
+    this.songsRef = ref(this.db, 'songs');
     onValue(this.songsRef, (snapshot) => {
       const data = snapshot.val();
-      const songs: Song[] = Object.keys(data).map(songId => {
+
+      this.songs = Object.keys(data)
+      .filter(songId => data[songId].ownerId === uid)
+      .map(songId => {
         data[songId].id = songId;
         return data[songId];
       });
-      this.songs = songs;
+
+      this.sharedSongs = Object.keys(data)
+      .filter(songId => {
+        if (data[songId].sharedUsers) {
+          if (data[songId].sharedUsers.includes(uid)) {
+            return true;
+          }
+        }
+      })
+      .map(songId => {
+        data[songId].id = songId;
+        return data[songId];
+      });
+
       this.isAuthObserver.next(true);
-    })
+    });
   }
 
   getSongRef(songId: string): DatabaseReference {
-    return ref(this.db, '/' + this.user.uid + this.path + "/" + songId);
+    return ref(this.db, this.path + "/" + songId);
+  }
+
+  getGroupsRef(): DatabaseReference {
+    return ref(this.db, '/groups')
+  }
+
+  getDeleteRef(songId: string): DatabaseReference {
+    return ref(this.db, this.path + '/' + songId);
   }
 }

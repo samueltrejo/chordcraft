@@ -56,7 +56,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
           <!-- song textarea -->
           <div *ngIf="isEdit" class="mt-2">
             <!-- <textarea class="song-textarea" rows="{{song.lyrics.split('\n').length}}">{{song.lyrics}}</textarea> -->
-            <textarea #lyrics id="lyrics" class="song-textarea" formControlName="lyrics" placeholder="Lyrics" autofocus
+            <textarea #lyrics id="lyrics" class="song-textarea" formControlName="lyrics" placeholder="Lyrics" spellcheck="false" autofocus
               (focus)="setCaret($event)"
               (click)="setCaret($event)"
               (keyup)="setCaret($event)"></textarea>
@@ -200,7 +200,8 @@ export class SongComponent implements OnInit {
         artist: [this.song.artist],
         lyrics: [this.song.lyrics],
         genres: [this.song.genres],
-        chords: [this.song.chords]
+        chords: [this.song.chords],
+        ownerId: [this.song.ownerId]
       });
     });
   }

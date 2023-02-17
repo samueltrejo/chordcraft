@@ -1,63 +1,76 @@
-1. Adding more chord options and chord progressions to the app.
-Sure, suggestion 1 was to add more chord options and chord progressions to your Chordcraft app. This would allow users to have more flexibility and creativity when writing songs,
-and it could also make the app more appealing to a wider range of musicians and songwriters.
+IDEAS TO IMPROVE CHORDCRAFT
+Add a feature that allows users to collaborate on songwriting projects in real-time. This could include a chat function and the ability to share and edit lyrics and chords simultaneously.
 
-To implement this feature, you could create a new component in your app that displays a list of chords and chord progressions, which users can select and add to their song.
-This component could also have a search function that allows users to quickly find specific chords or chord progressions.
+Add a feature that suggests chord progressions based on the lyrics that have been written. This could help users who are stuck on a particular section of a song.
 
-In addition to this, you could also include a feature that suggests chord progressions based on the lyrics or the key of the song.
-This could be done by using a machine learning algorithm that can analyze the lyrics and generate chord progressions that match the sentiment or the style of the song.
+Allow users to save multiple versions of a song and switch between them easily. This could be useful for comparing different versions of a song and deciding which one to use.
 
-Another option would be to allow users to input chords and chord progression by themselves, this could be done by adding a chord editor in the app where users can input their own chords and chord progressions and save them for future use.
+Create a system where users can save songs to different projects, such as a solo project or a band project.
 
-It is important to note that this suggestion could require a significant amount of work, especially if you want to include the machine learning algorithm, it would require a good understanding of music theory and programming.
+Add a feature that allows users to export their lyrics and chords in a variety of file formats, such as PDF or MusicXML, so they can be used in other music notation software.
 
-2. Adding a built-in metronome and/or drum machine to help users keep time while they play.
+Create a feature that allows users to search for and find songs based on certain parameters such as genre, mood and lyrics.
 
-3. Adding a feature that allows users to save their songs and come back to them later.
+Create a feature for users to share their songs on social media, or to embed their songs on other websites.
 
-4. Adding a feature that allows users to export their songs in a variety of file formats, such as PDF or MIDI.
+Offer a paid subscription service that includes additional features such as advanced chord suggestions, melody generation, and access to a larger library of chord progressions.
 
-5. Adding a feature that allows users to share their songs with others, either through a built-in social media feature or by exporting the song in a sharable file format.
+Create a feature that allows users to add audio recordings or MIDI files to their songs, so they can hear how they sound.
 
-6. Improving the UI/UX to make the app more intuitive and user-friendly
+Create a mobile app version of your website, so users can access their songs and lyrics on the go.
 
-7. Adding a feature that allows users to change the key of the song, including the ability to change the key of the lyrics
 
-8. Considering adding a feature that will allow the user to record their song and play it back.
-You could organize the layout of the app in a way that makes it easy for users to navigate and find the features they need. This could include:
+FIREBASE RULES
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "auth.uid === $uid",
+        ".write": "auth.uid === $uid"
+      }
+    },
+    "songs": {
+      ".indexOn": ["user_id"],
+      "$song_id": {
+        ".read": "data.child('user_id').val() === auth.uid",
+        ".write": "data.child('user_id').val() === auth.uid"
+      }
+    },
+    "shared_songs": {
+      "$song_id": {
+        ".read": "data.child('user_ids').hasChild(auth.uid)",
+        ".write": "data.child('user_ids').hasChild(auth.uid)"
+      }
+    }
+  }
+}
 
-A navigation bar at the top of the screen that allows users to quickly switch between different sections of the app
-A main area of the screen that displays the lyrics and chords of the song, and allows users to add, edit, and delete chords
-A sidebar on the left or right side of the screen that displays the chord options and chord progressions, and allows users to search for specific chords or chord progressions.
-A button that allows users to transpose the chords
-A button that allows users to play the chords
-A button that allows users to save their songs
-A button that allows users to export their songs
-A button that allows users to share their songs
-A button that allows users to change the key of the song
-A button that allows the user to record their song and play it back
-A label that displays the count of the chord progression
-You can also consider adding a visual representation of the chord progression like a chord diagram or a piano roll, this could help users understand the chord progression better and enhance their songwriting experience.
-
-It's also important to use colors, typography, and other design elements in a way that makes the app visually appealing and easy to use.
-
-Keep in mind that this is just a general idea, and the actual design of the app will depend on the specific requirements and constraints of the project.
-
-9. There are several ways to make money from an application like Chordcraft, here are a few suggestions:
-
-Offer a freemium model: Offer a free version of the app with basic features, and then charge for additional features, like more chord options, chord progressions, or exporting capabilities.
-
-In-app purchases: Offer users the ability to purchase additional features or virtual items within the app, such as new chord progressions, or chord sheet packs.
-
-Subscriptions: Offer a subscription-based model where users pay a monthly or annual fee to access premium features.
-
-Advertising: Include ads in the app and earn revenue from them.
-
-Sponsorship: Partner with music-related companies or brands and include their products or services in the app in exchange for a fee.
-
-Consulting: Offer consulting services to help musicians and songwriters with their songwriting and transposition needs.
-
-Affiliate marketing: Use affiliate marketing to promote music-related products, such as guitars, sheet music, or recording equipment and earn commission from sales.
-
-It's important to note that these are just a few suggestions, and the best monetization strategy for your app will depend on your target audience, their needs, and the features of your app. You should also consider the cost of creating and maintaining the app, as well as any legal and regulatory requirements that may apply to your app and region.
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "auth.uid === $uid",
+        ".write": "auth.uid === $uid"
+      }
+    },
+    "songs": {
+      ".indexOn": "user_id",
+      ".read": "auth.uid !== null &&
+      					query.orderByChild === 'user_id' &&
+                query.equalTo === auth.uid",
+      "$song_id": {
+        ".read": true
+      },
+      ".write": "auth.uid !== null"
+    },
+    "shared_songs": {
+      ".read": true,
+      "$song_id": {
+        ".read": "auth.uid !== null &&
+      					query.orderByChild === 'user_ids' &&
+                query.equalTo === auth.uid",
+        ".write": "data.child('user_ids').hasChild(auth.uid)"
+      }
+    }
+  }
+}

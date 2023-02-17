@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -9,6 +10,9 @@ import { SongComponent } from './components/song.component';
 import { LyricComponent } from './components/lyric.component';
 import { NavbarComponent } from './components/navbar.component';
 import { ChordComponent } from './components/chord.component';
+import { GroupsComponent } from './components/groups.component';
+import { HomeComponent } from './components/home.component';
+import { RegisterComponent } from './components/register.component';
 
 @NgModule({
   declarations: [
@@ -18,12 +22,15 @@ import { ChordComponent } from './components/chord.component';
     LyricComponent,
     NavbarComponent,
     ChordComponent,
-    // LyricComponent
+    GroupsComponent,
+    HomeComponent,
+    RegisterComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]

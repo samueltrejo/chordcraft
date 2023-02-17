@@ -10,6 +10,8 @@ $colorDark: #404040;
 $colorDarker: #212529;
 $colorGrey: #6c757d;
 $colorAccent: $colorBlue;
+
+$colorDarkOp50: #6c757dc2;
 $colorAccentOp50: $colorBlueOp50;
 
 // font sizes
@@ -55,6 +57,30 @@ body::-webkit-scrollbar {
 .navbar {
   font-family: $fontFamHeebo;
   color: $colorLight;
+
+  .nav-item {
+    cursor: pointer;
+  }
+}
+
+/* Home */
+.home {
+  // min-height: 100%;
+  // background: url('./assets/img_tealfender.jpg');
+  // background-size: cover;
+  // height: 100vh;
+}
+
+/* Register */
+.register {
+  font-family: $fontFamHeebo;
+  background-color: $colorLight;
+  border-radius: 5px;
+  padding: 50px;
+
+  .title {
+    font-size: $fontSizeLg;
+  }
 }
 
 /* Library */
@@ -64,6 +90,43 @@ body::-webkit-scrollbar {
   .list-group-item {
     background-color: $colorGrey;
     cursor: pointer;
+  }
+
+  .list-group-item .delete-song-btn{
+    visibility: hidden;
+  }
+
+  .list-group-item:hover .delete-song-btn{
+    visibility: visible;
+  }
+
+  .title-row {
+    background-color: $colorDarkOp50;
+    color: $colorDarker;
+    border: none;
+  }
+
+  .delete-song-btn {
+    border: none;
+  }
+
+  .library-nav {
+    // background-color: $colorDark;
+    color: $colorLight;
+    padding: 5px;
+    border-radius: 5px;
+  }
+
+  .library-nav-active {
+    background-color: $colorDark;
+    color: $colorLight;
+    padding: 5px;
+    border-radius: 3px;
+  }
+
+  .group-card {
+    background-color: $colorDark;
+    color: $colorLight;
   }
 }
 

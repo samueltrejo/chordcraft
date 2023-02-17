@@ -1,0 +1,29 @@
+{
+    "users": {
+      "user1": {
+        "name": "John Smith",
+        "email": "johnsmith@example.com",
+        "profile_picture": "https://example.com/images/john_smith.jpg"
+      },
+      "user2": {
+        "name": "Jane Doe",
+        "email": "janedoe@example.com",
+        "profile_picture": "https://example.com/images/jane_doe.jpg"
+      }
+    },
+    "songs": {
+      "song1": {
+        "title": "My First Song",
+        "lyrics": "Verse 1: I wrote my first song today...",
+        "chords": "C, F, G, Am",
+        "user_ids": ["user1", "user2"]
+      },
+      "song2": {
+        "title": "Collaboration Song",
+        "lyrics": "Verse 1: You wrote the words, I wrote the melody...",
+        "chords": "D, G, A, Bm",
+        "user_ids": ["user1", "user2"]
+      }
+    }
+  }
+  

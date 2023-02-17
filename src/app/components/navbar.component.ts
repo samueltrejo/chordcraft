@@ -1,30 +1,24 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { User } from 'firebase/auth';
-import { FirebaseService } from '../services/firebase.service';
+import { UserService } from '../services/user.service';
 
 @Component({
   selector: 'app-navbar',
   template: `
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <nav class="navbar navbar-dark bg-dark">
     <div class="container-fluid">
       <a class="navbar-brand" routerLink="/">ChordCraft</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav">
-          <li class="nav-item">
-            <a class="nav-link active" routerLink="/">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link">New Song +</a>
-          </li>
-          <li class="nav-item">
-            <a *ngIf="!isAuth" class="nav-link" (click)="googleSignIn()">Sign In</a>
-            <a *ngIf="isAuth" class="nav-link" (click)="googleSignOut()">Sign Out</a>
-          </li>
-        </ul>
-      </div>
+      <ul class="navbar-nav">
+        <!-- <li class="nav-item">
+          <a class="nav-link active" routerLink="/">Home</a>
+        </li> -->
+        <!-- <li *ngIf="uid" class="nav-item">
+          <a class="nav-link">{{uid}}</a>
+        </li> -->
+        <li class="nav-item">
+          <a *ngIf="!uid" class="nav-link" (click)="googleSignIn()">Sign In</a>
+          <a *ngIf="uid" class="nav-link" (click)="googleSignOut()">Sign Out</a>
+        </li>
+      </ul>
     </div>
   </nav>
   `,
@@ -32,18 +26,23 @@ import { FirebaseService } from '../services/firebase.service';
   ]
 })
 export class NavbarComponent implements OnInit {
-  @Input() isAuth;
+  @Input() user;
+  uid: string;
 
-  constructor(private firebaseService: FirebaseService) { }
+  constructor(private userService: UserService) { }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    this.userService.uidObserver.subscribe((value) => {
+      this.uid = value;
+    });
+  }
 
   googleSignIn() {
-    this.firebaseService.googleSignIn();
+    this.userService.googleSignIn();
   }
 
   googleSignOut() {
-    this.firebaseService.googleSignOut();
+    this.userService.googleSignOut();
   }
 
 }

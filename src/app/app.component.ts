@@ -1,22 +1,23 @@
 import { Component } from '@angular/core';
-import { FirebaseService } from './services/firebase.service';
+import { User } from './models/user';
+import { UserService } from './services/user.service';
 
 @Component({
   selector: 'app-root',
   template: `
-    <app-navbar [isAuth]="isAuth"></app-navbar>
-    <router-outlet *ngIf="isAuth"></router-outlet>
+    <app-navbar [user]="user"></app-navbar>
+    <router-outlet></router-outlet>
   `,
   styles: []
 })
 export class AppComponent {
-  isAuth: boolean = false;
+  user: User;
   
-  constructor(private firebaseService: FirebaseService) { }
+  constructor(private userService: UserService) { }
 
   ngOnInit(): void {
-    this.firebaseService.isAuthObserver.subscribe((value) => {
-      this.isAuth = value;
+    this.userService.userObserver.subscribe((value) => {
+      this.user = value;
     });
   }
 }
