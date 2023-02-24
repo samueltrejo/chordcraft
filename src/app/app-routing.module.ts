@@ -7,12 +7,12 @@ import { RegisterComponent } from './components/register.component';
 import { SongComponent } from './components/song.component';
 
 const routes: Routes = [
-  // { path: '', redirectTo: '/songs', pathMatch: 'full' },
   { path: '', component: HomeComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'songs', component: LibraryComponent },
+  { path: 'songs/:songId', component: SongComponent },
   { path: 'groups', component: GroupsComponent },
-  { path: ':songId', component: SongComponent }
+  {path: '**', redirectTo: ''},
 ];
 
 @NgModule({

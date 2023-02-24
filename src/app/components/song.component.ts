@@ -1,36 +1,33 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FirebaseService } from 'src/app/services/firebase.service';
+// import { FirebaseService } from 'src/app/services/firebase.service';
 import { child, DatabaseReference, get, ref, set } from "firebase/database";
 import { Song } from '../models/song';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { SongService } from '../services/song.service';
 
 @Component({
   selector: 'app-song',
   template: `
-    <div *ngIf="song" class="song">
+    <div class="song">
 
       <div class="song-container container p-4">
         <form *ngIf="songForm" [formGroup]="songForm" (keyup)="autoSave()">
   
           <!-- song info -->
-          <div *ngIf="isAdmin" id="song-genres" class="mt-2">
-            <span *ngFor="let genre of song.genres" class="badge me-2">{{genre}} <i class="bi bi-x" (click)="removeGenre(genre)"></i></span>
+          <div id="song-genres" class="mt-2">
+            <span *ngFor="let genre of genres" class="badge me-2">{{genre}} <i class="bi bi-x" (click)="removeGenre(genre)"></i></span>
             <span class="badge" data-bs-toggle="modal" data-bs-target="#genre-modal">Add Genre<i class="bi bi-plus"></i></span>
           </div>
 
-          <div *ngIf="isAdmin" class="song-info">
+          <div class="song-info">
             <input class="song-title d-block mt-2" formControlName="title" autocomplete="off" placeholder="Title">
             <input class="song-artist d-block mt-2" formControlName="artist" autocomplete="off" placeholder="Artist">
-          </div>
-          <div *ngIf="!isAdmin" class="song-info">
-            <input class="song-title d-block" formControlName="title" autocomplete="off" placeholder="Title" disabled>
-            <input class="song-artist d-block" formControlName="artist" autocomplete="off" placeholder="Artist" disabled>
           </div>
 
           <!-- menu buttons -->
           <div class="song-menu d-flex mt-2">
-            <button *ngIf="isAdmin" class="btn btn-outline-primary btn-sm me-2" (click)="toggleEdit()">Edit Lyrics</button>
+            <button class="btn btn-outline-primary btn-sm me-2" (click)="toggleEdit()">Edit Lyrics</button>
             <button *ngIf="!isEdit" class="btn btn-outline-primary btn-sm me-2" (click)="transpose(false)">Transpose Down</button>
             <button *ngIf="!isEdit" class="btn btn-outline-primary btn-sm me-2" (click)="transpose(true)">Transpose Up</button>
             <button *ngIf="isEdit" class="btn btn-outline-primary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#chord-modal">Add Chord</button>
@@ -38,7 +35,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 
           <!-- quick chord select -->
           <div *ngIf="isEdit" class="chord-selection mt-2">
-            <button *ngFor="let chord of song.chords" class="position-relative btn btn-outline-primary btn-sm me-3" (click)="handleQuickChord($event, chord)">
+            <button *ngFor="let chord of chords" class="position-relative btn btn-outline-primary btn-sm me-3" (click)="handleQuickChord($event, chord)">
               {{chord}}
               <i class="position-absolute bi bi-x corner-btn"></i>
             </button>
@@ -149,14 +146,13 @@ import { FormBuilder, FormGroup } from '@angular/forms';
   ]
 })
 export class SongComponent implements OnInit {
-  song: Song;
+  // song: Song;
   songId: string;
-  isAuth: boolean = false;
+  genres: string[] = [];
+  chords: string[] = [];
 
-  songsRef: DatabaseReference;
   songForm: FormGroup;
   isEdit: boolean = false;
-  isAdmin: boolean = true;
   chordBase: string = "A";
   caret: number;
 
@@ -168,45 +164,41 @@ export class SongComponent implements OnInit {
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private firebaseService: FirebaseService) { }
+    private songService: SongService
+    ) { }
 
   ngOnInit(): void {
     this.songId = this.route.snapshot.paramMap.get("songId");
     this.getSong();
   }
 
+  ngOnDestroy(): void {
+    this.songService.unsubsbribeSongListener();
+  }
+
   getSong(): void {
-    get(child(this.firebaseService.songsRef, '/' + this.songId)).then(snapshot => {
-      const data: Song = snapshot.val();
+    this.songService.initSongListener(this.songId);
+    this.songService.songObserver.subscribe((song) => {
+      this.configureSongData(song);
+    });
+    this.songService.getSong(this.songId);
+  }
 
-      // Check song for errors eg. bracket issues.
-      // This locks textarea to prevent table issues, and allows fixing in editor.
-      this.hasErrorInLyrics(data.lyrics);
+  configureSongData(song: Song): void {
+    this.genres = song.genres;
+    this.chords = song.chords;
 
-      data.id = this.songId;
-      this.song = data;
-
-      if (this.song.genres == null) {
-        this.song.genres = [];
-      }
-      
-      if (this.song.chords == null) {
-        this.song.chords = [];
-      }
-
-      // TODO: look into fix for, songform is getting updated without updating form because this.song is still it's reference,
-      this.songForm = this.fb.group({
-        title: [this.song.title],
-        artist: [this.song.artist],
-        lyrics: [this.song.lyrics],
-        genres: [this.song.genres],
-        chords: [this.song.chords],
-        ownerId: [this.song.ownerId]
-      });
+    this.errorCheckLyrics(song.lyrics);
+    
+    this.songForm = this.fb.group({
+      title: [song.title],
+      artist: [song.artist],
+      lyrics: [song.lyrics],
+      ownerId: [song.ownerId]
     });
   }
 
-  hasErrorInLyrics(lyrics: string): boolean {
+  errorCheckLyrics(lyrics: string): boolean {
     const numOfLeftBracket = (lyrics.match(/\[/g)||[]).length;
     const numOfRightBracket = (lyrics.match(/\]/g)||[]).length;
     const lastLeftBracketPosition = lyrics.lastIndexOf('[');
@@ -229,20 +221,20 @@ export class SongComponent implements OnInit {
   }
 
   autoSave(): void {
-    const songRef = this.firebaseService.getSongRef(this.songId);
-    set(songRef, this.songForm.value);
+    const song: Song = this.songForm.value;
+    song.genres = this.genres;
+    song.chords = this.chords;
+    this.songService.updateSong(this.songId, song);
   }
 
   removeGenre(genre: string): void {
-    this.song.genres = this.song.genres.filter(x => x != genre);
-    this.songForm.controls['genres'].setValue(this.song.genres);
+    this.genres = this.genres.filter(x => x != genre);
     this.autoSave();
   }
 
   addGenre(ref: any): void {
     if (ref.value != null && ref.value != '') {
-      this.song.genres.push(ref.value);
-      this.songForm.controls['genres'].setValue(this.song.genres);
+      this.genres.push(ref.value);
       this.autoSave();
     }
   }
@@ -250,8 +242,8 @@ export class SongComponent implements OnInit {
   addChord(): void {
     const chordDesc = this.chordDescriptorForm.controls['chordDescriptor'].value;
     const chord = this.chordBase + chordDesc;
-    if (!this.song.chords.includes(chord)) {
-      this.song.chords.push(chord);
+    if (!this.chords.includes(chord)) {
+      this.chords.push(chord);
     }
     let lyrics = this.songForm.controls['lyrics'].value;
     lyrics = lyrics.slice(0, this.caret) + `[${chord}]` + lyrics.slice(this.caret);
@@ -269,8 +261,7 @@ export class SongComponent implements OnInit {
       this.songForm.controls['lyrics'].setValue(lyrics);
       this.caret += chord.length + 2;
     } else if (elementName == 'i') {
-      this.song.chords = this.song.chords.filter(x => x != chord);
-      this.songForm.controls['chords'].setValue(this.song.chords);
+      this.chords = this.chords.filter(x => x != chord);
     }
 
     this.focusTextArea(500);
@@ -295,7 +286,7 @@ export class SongComponent implements OnInit {
   }
 
   toggleEdit(): void {
-    if (!this.hasErrorInLyrics(this.songForm.controls['lyrics'].value)) {
+    if (!this.errorCheckLyrics(this.songForm.controls['lyrics'].value)) {
       this.isEdit = !this.isEdit;
       this.focusTextArea(100);
     }
@@ -303,7 +294,7 @@ export class SongComponent implements OnInit {
 
   focusTextArea(delayMs: number): void {
     if (this.isEdit) {
-      setTimeout(x => {
+      setTimeout(() => {
         const textArea = document.getElementById('lyrics') as HTMLTextAreaElement;
         if (this.caret != null) {
           textArea.setSelectionRange(this.caret, this.caret);

@@ -1,13 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { User } from '../models/user';
+import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 
 import { initializeApp } from 'firebase/app';
+import { Database, DatabaseReference, getDatabase, ref } from 'firebase/database';
 import { GoogleAuthProvider, getAuth, signInWithRedirect, Auth, onAuthStateChanged, signOut } from 'firebase/auth';
+
 import { fbConfig } from '../models/fbConfig';
-import { Router } from '@angular/router';
+import { User } from '../models/user';
 
 @Injectable({
   providedIn: 'root'
@@ -16,17 +17,18 @@ export class UserService {
   private url: string = "/api/users";
   private google: GoogleAuthProvider;
   private auth: Auth;
+  private db: Database;
 
-  public uid: string;
-  public uidObserver: Subject<string> = new Subject<string>();
   public user: User;
   public userObserver: Subject<User> = new Subject<User>();
 
-  constructor(private http: HttpClient,
-    private router: Router) {
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ) {
     // Initialize Firebase
     initializeApp(fbConfig);
-    // this.db = getDatabase();
+    this.db = getDatabase();
 
     // Initialize Auth
     this.google = new GoogleAuthProvider();
@@ -34,18 +36,24 @@ export class UserService {
 
     // Get Auth Info
     this.userObserver.subscribe(value => this.user = value);
-    this.uidObserver.subscribe(value => this.uid = value);
     onAuthStateChanged(this.auth, (user) => {
       if (user) {
-        this.uidObserver.next(user.uid);
         this.http.get<User>(this.url + '/' + user.uid)
           .subscribe((data) => {
             if (data) {
               this.userObserver.next(data);
             } else {
-              this.router.navigate(['/register']);
+              const appUser: User = {
+                uid: user.uid,
+                displayName: user.displayName,
+                email: user.email
+              };
+              this.addUser(appUser);
             }
-          });
+        });
+      } else {
+        this.userObserver.next(null);
+        this.router.navigate(['']);
       }
     });
   }
@@ -55,18 +63,16 @@ export class UserService {
   }
 
   googleSignOut() {
-    signOut(this.auth).then(() => {
-      this.userObserver.next(null);
-    }).catch((error) => {
-      console.log('An error occured while logging out. ' + error);
+    signOut(this.auth);
+  }
+
+  addUser(user: User): void {
+    this.http.post<User>(this.url + '/' + user.uid, user).subscribe((data) => {
+      this.userObserver.next(data);
     });
   }
 
-  getUser(): User {
-    return this.user;
+  getDbRef(path: string): DatabaseReference {
+    return ref(this.db, path);
   }
-
-  // getUser(): Observable<User> {
-  //   return this.http.get<User>(this.url + '/9AKicXpRP2ZUSnyJ2BvGZZMt4vn1');
-  // }
 }

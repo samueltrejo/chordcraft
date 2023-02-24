@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { FirebaseService } from '../services/firebase.service';
+import { Chord } from '../models/chord';
+import { ChordService } from '../services/chord.service';
 
 // const notes = {
 //   a: new Howl({ src: ['assets/a.wav'] }),
@@ -161,12 +162,15 @@ import { FirebaseService } from '../services/firebase.service';
 })
 export class ChordComponent implements OnInit {
   @Input() chordString;
-  chord;
+  chord: Chord;
 
-  constructor(private firebaseService: FirebaseService) { }
+  constructor(
+    private chordService: ChordService
+    ) { }
 
   ngOnInit(): void {
-    this.chord = this.firebaseService.chords.find(x => x.name == this.chordString.toLowerCase());
+    // this.chord = this.firebaseService.chords.find(x => x.name == this.chordString.toLowerCase());
+    this.chord = this.chordService.getChord(this.chordString);
   }
 
   playChord(): void {

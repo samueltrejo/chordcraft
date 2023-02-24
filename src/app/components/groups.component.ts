@@ -2,46 +2,37 @@ import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { push } from 'firebase/database';
 import { Group } from '../models/group';
-import { FirebaseService } from '../services/firebase.service';
 
 @Component({
   selector: 'app-groups',
   template: `
-  <div class="library container p-0">
+  <div class="library song container p-0">
     <ul class="list-group">
-      <li class="list-group-item title-row">
-        <div class="d-flex justify-content-end">
-          <div class="me-2 {{path === '/songs' ? 'library-nav-active' : 'library-nav'}}" routerLink="/songs">My Songs</div>
-          <div class="{{path === '/groups' ? 'library-nav-active' : 'library-nav'}}" routerLink="/groups">Groups</div>
-        </div>
-      </li>
-      <li class="list-group-item title-row">
-        <div class="row mx-0">
-          <div class="col-6 px-0">Title</div>
-          <div class="col-6 px-0 align-self-center">Genres</div>
-        </div>
-      </li>
-      <!-- <li *ngFor="let song of songs" class="list-group-item" (click)="goToSong($event, song.id)">
-        <div class="row mx-0">
-          <div class="col-6 px-0">
-            <div style="font-weight: bold;">{{song.title}}</div>
-            <div style="font-style: italic;">{{song.artist}}</div>
-          </div>
-          <div class="col-6 px-0 align-self-center justify-content-between">
-            <div class="d-flex justify-content-between">
-              <div><span *ngFor="let genre of song.genres">{{genre}} </span></div>
-              <button id="delete-song-btn" class="btn btn-outline-primary btn-sm me-2 delete-song-btn" (click)="deleteSong(song.id)"><i id="delete-song-icon" class="bi bi-trash-fill"></i></button>
-            </div>
-          </div>
-        </div>
-      </li> -->
-      <!-- <li class="list-group-item lib-song" (click)="newSong()">new song +</li> -->
-      <li class="list-group-item lib-song text-end" (click)="newGroup()">
+      <li class="list-group-item">An item</li>
+      <li class="list-group-item lib-song text-end" data-bs-toggle="modal" data-bs-target="#group-modal">
         <span>New Group</span>
         <!-- <i class="bi bi-music-note"></i> -->
         <i class="bi bi-plus"></i>
       </li>
     </ul>
+
+    <!-- group modal -->
+    <div class="genre-modal modal fade" id="group-modal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <div class="modal-title" id="exampleModalLabel">Add a genre</div>
+            <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+            <i class="bi bi-x-circle" data-bs-dismiss="modal"></i>
+          </div>
+          <div class="modal-body position-relative">
+            <!-- <input class="song-genre d-block" formControlName="title" autocomplete="off" placeholder="Genre"> -->
+            <input #genre class="song-genre d-block" autocomplete="off" placeholder="Genre">
+            <i class="genre-submit bi bi-send-fill" data-bs-dismiss="modal" (click)="newGroup()"></i>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
   `,
   styles: [
@@ -50,19 +41,14 @@ import { FirebaseService } from '../services/firebase.service';
 export class GroupsComponent implements OnInit {
   path: string;
 
-  constructor(private firebaseService: FirebaseService, private location: Location) { }
+  constructor(
+    ) { }
 
   ngOnInit(): void {
-    this.path = this.location.path();
   }
 
   newGroup(): void {
-    const group: Group = {
-      name: 'Group1',
-      ownerId: this.firebaseService.user.uid,
-      users: [ 'CyeosVZLLwQdhxtozRJ7s0Bq5wD3' ]
-    }
-    push(this.firebaseService.getGroupsRef(), group).then(x => console.log(x.key));
+
   }
 
 }

@@ -1,21 +1,11 @@
 import { Injectable } from '@angular/core';
-import { Song } from '../models/song';
-
-import { initializeApp } from 'firebase/app';
-import { getDatabase, ref, onValue, Database, DatabaseReference, remove } from "firebase/database";
-import { fbConfig } from '../models/fbConfig';
-import { GoogleAuthProvider, getAuth, signInWithRedirect, Auth, onAuthStateChanged, signOut, User } from 'firebase/auth';
-import { Subject } from 'rxjs';
 import { Howl } from 'howler';
+import { Chord } from '../models/chord';
 
 @Injectable({
   providedIn: 'root'
 })
-export class FirebaseService {
-  private readonly path = '/songs';
-  private db: Database;
-  private google: GoogleAuthProvider;
-  private auth: Auth;
+export class ChordService {
 
   private notes = {
     a: new Howl({ src: ['assets/a.wav'] }),
@@ -32,7 +22,7 @@ export class FirebaseService {
     gs: new Howl({ src: ['assets/gs.wav'] })
   };
 
-  chords = [
+  private chords: Chord[] = [
     { name: 'a', root: this.notes.a, quality: '', notes: [ this.notes.cs, this.notes.e ] },
     { name: 'a#', root: this.notes.as, quality: '', notes: [ this.notes.d, this.notes.f ] },
     { name: 'b', root: this.notes.b, quality: '', notes: [ this.notes.ds, this.notes.fs ] },
@@ -167,88 +157,9 @@ export class FirebaseService {
     { name: 'g#aug', root: this.notes.gs, quality: '', notes: [ this.notes.c, this.notes.e ] },
   ];
 
-  user: User;
-  isAuth: boolean = false;
-  isAuthObserver: Subject<boolean> = new Subject<boolean>();
+  constructor() { }
 
-  songsRef: DatabaseReference;
-  songs: Song[];
-  sharedSongs: Song[];
-  songsObserver: Subject<Song[]> = new Subject<Song[]>();
-
-  constructor() {
-    // Initialize Firebase
-    initializeApp(fbConfig);
-    this.db = getDatabase();
-
-    // Initialize Auth
-    this.google = new GoogleAuthProvider();
-    this.auth = getAuth();
-
-    // Get Auth Info
-    this.isAuthObserver.subscribe(value => this.isAuth = value);
-    onAuthStateChanged(this.auth, (user) => {
-      if (user) {
-        this.user = user;
-        this.initSongsRef(user.uid);
-      } else {
-
-      }
-    });
-  }
-
-  googleSignIn() {
-    signInWithRedirect(this.auth, this.google);
-  }
-
-  googleSignOut() {
-    signOut(this.auth).then(() => {
-      this.user = null;
-      this.isAuthObserver.next(false);
-    }).catch((error) => {
-      console.log('An error happened while logging out. ' + error);
-    });
-  }
-
-  initSongsRef(uid: string): void {
-    // retreiving songs
-    this.songsRef = ref(this.db, 'songs');
-    onValue(this.songsRef, (snapshot) => {
-      const data = snapshot.val();
-
-      this.songs = Object.keys(data)
-      .filter(songId => data[songId].ownerId === uid)
-      .map(songId => {
-        data[songId].id = songId;
-        return data[songId];
-      });
-
-      this.sharedSongs = Object.keys(data)
-      .filter(songId => {
-        if (data[songId].sharedUsers) {
-          if (data[songId].sharedUsers.includes(uid)) {
-            return true;
-          }
-        }
-      })
-      .map(songId => {
-        data[songId].id = songId;
-        return data[songId];
-      });
-
-      this.isAuthObserver.next(true);
-    });
-  }
-
-  getSongRef(songId: string): DatabaseReference {
-    return ref(this.db, this.path + "/" + songId);
-  }
-
-  getGroupsRef(): DatabaseReference {
-    return ref(this.db, '/groups')
-  }
-
-  getDeleteRef(songId: string): DatabaseReference {
-    return ref(this.db, this.path + '/' + songId);
+  getChord(chordString: string): Chord {
+    return this.chords.find(x => x.name === chordString.toLowerCase());
   }
 }

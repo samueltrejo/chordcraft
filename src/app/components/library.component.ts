@@ -1,21 +1,23 @@
 import { Component, OnInit } from '@angular/core';
-import { FirebaseService } from 'src/app/services/firebase.service';
+// import { FirebaseService } from 'src/app/services/firebase.service';
 import { Song } from 'src/app/models/song';
 import { Router } from '@angular/router';
 import { push, remove } from 'firebase/database';
 import { Location } from '@angular/common';
+import { SongService } from '../services/song.service';
+import { UserService } from '../services/user.service';
 
 @Component({
   selector: 'app-library',
   template: `
   <div class="library container p-0">
     <ul class="list-group">
-      <li class="list-group-item title-row">
+      <!-- <li class="list-group-item title-row">
         <div class="d-flex justify-content-end">
           <div class="me-2 {{path === '/songs' ? 'library-nav-active' : 'library-nav'}}" routerLink="/songs">My Songs</div>
           <div class="{{path === '/groups' ? 'library-nav-active' : 'library-nav'}}" routerLink="/groups">Groups</div>
         </div>
-      </li>
+      </li> -->
       <li class="list-group-item title-row">
         <div class="row mx-0">
           <div class="col-6 px-0">Title</div>
@@ -49,45 +51,38 @@ import { Location } from '@angular/common';
 })
 export class LibraryComponent implements OnInit {
   songs: Song[];
-  sharedSongs: Song[];
-  isAuth: boolean = false;
-  path: string;
+  // sharedSongs: Song[];
 
   constructor(
-    private firebaseService: FirebaseService,
-    private location: Location,
+    private songService: SongService,
+    // private location: Location,
     private router: Router) { }
 
   ngOnInit(): void {
-    this.path = this.location.path();
-    this.populateData();
+    // this.path = this.location.path();
+    this.getSongs();
   }
 
-  populateData(): void {
-    this.isAuth = this.firebaseService.isAuth;
-    this.songs = this.firebaseService.songs;
+  getSongs(): void {
+    this.songService.songsObserver.subscribe((songs) => {
+      this.songs = songs;
+    });
+    this.songService.getSongs();
   }
 
   goToSong($event, songId: string): void {
     const elementId = $event.srcElement.id;
     if (elementId !== 'delete-song-btn' && elementId !== 'delete-song-icon') {
-      this.router.navigate([songId]);
+      this.router.navigate(['songs/' + songId]);
     }
   }
 
   newSong(): void {
-    const song: Song = {
-      title: 'My Awsome Song',
-      artist: this.firebaseService.user.displayName,
-      lyrics: 'My [G]awsome song lyrics',
-      ownerId: this.firebaseService.user.uid
-    }
-    push(this.firebaseService.songsRef, song).then(x => this.router.navigate([x.key]));
+    this.songService.addSong();
   }
 
   deleteSong(songId: string): void {
-    const deleteRef = this.firebaseService.getDeleteRef(songId);
-    remove(deleteRef).then(() => this.populateData());
+    this.songService.deleteSong(songId);
   }
 
 }
